@@ -1,5 +1,7 @@
-package com.nnk.poseidon.converters;
+package com.nnk.poseidon.unit.converters;
 
+import com.nnk.poseidon.converters.BidListConverter;
+import com.nnk.poseidon.converters.BidListConverterImpl;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import org.junit.jupiter.api.*;
