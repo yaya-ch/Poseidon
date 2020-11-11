@@ -6,7 +6,7 @@ import com.nnk.poseidon.dto.BidListDTO;
 import java.util.List;
 
 /**
- * This interface provides some abstract methods that allow
+ * This interface provides some abstract methods that allow.
  * conversion from/to BidList entity/BidListDTO
  *
  * @author Yahia CHERIFI

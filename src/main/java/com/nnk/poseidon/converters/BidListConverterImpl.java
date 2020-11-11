@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 @Component
 public class BidListConverterImpl implements BidListConverter {
 
+    /**
+     * ModelMapper to inject.
+     */
     private final ModelMapper mapper;
 
     /**
@@ -27,7 +30,7 @@ public class BidListConverterImpl implements BidListConverter {
      * @param modelMapper the model mapper
      */
     @Autowired
-    public BidListConverterImpl(ModelMapper modelMapper) {
+    public BidListConverterImpl(final ModelMapper modelMapper) {
         this.mapper = modelMapper;
     }
 
@@ -38,7 +41,7 @@ public class BidListConverterImpl implements BidListConverter {
      * @return BidList entity
      */
     @Override
-    public BidList bidListDTOToBidListEntity(BidListDTO bidListDTO) {
+    public BidList bidListDTOToBidListEntity(final BidListDTO bidListDTO) {
         return mapper.map(bidListDTO, BidList.class);
     }
 
@@ -49,7 +52,8 @@ public class BidListConverterImpl implements BidListConverter {
      * @return a list of BidList entities
      */
     @Override
-    public List<BidList> bidListDTOsToBidListEntities(List<BidListDTO> bidListDTOList) {
+    public List<BidList> bidListDTOsToBidListEntities(
+            final List<BidListDTO> bidListDTOList) {
         return bidListDTOList.stream()
                 .map(this::bidListDTOToBidListEntity)
                 .collect(Collectors.toList());
@@ -62,7 +66,7 @@ public class BidListConverterImpl implements BidListConverter {
      * @return a bidListDTO
      */
     @Override
-    public BidListDTO bidListEntityToBidListDTO(BidList bidList) {
+    public BidListDTO bidListEntityToBidListDTO(final BidList bidList) {
         return mapper.map(bidList, BidListDTO.class);
     }
 
@@ -73,7 +77,8 @@ public class BidListConverterImpl implements BidListConverter {
      * @return a list of BidListDTOs
      */
     @Override
-    public List<BidListDTO> bidListEntitiesToBidListDTOs(List<BidList> bidListList) {
+    public List<BidListDTO> bidListEntitiesToBidListDTOs(
+            final List<BidList> bidListList) {
         return bidListList.stream()
                 .map(this::bidListEntityToBidListDTO)
                 .collect(Collectors.toList());
