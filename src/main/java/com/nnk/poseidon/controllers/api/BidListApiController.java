@@ -3,6 +3,8 @@ package com.nnk.poseidon.controllers.api;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bidList")
+@Api(description = "CRUD Operations on BidList")
 public class BidListApiController {
 
     /**
@@ -63,6 +66,7 @@ public class BidListApiController {
      * @param bidListDTO bidList dto to save
      * @return message that indicates a successful operation
      */
+    @ApiOperation(value = "Save a new BidList")
     @PostMapping("/add")
     public String saveBidList(@RequestBody final BidListDTO bidListDTO) {
         LOGGER.debug("POST request sent from the saveBidList"
@@ -78,6 +82,7 @@ public class BidListApiController {
      * @param bidListDTO the bid list dto
      * @return the string
      */
+    @ApiOperation(value = "Update an existing BidList")
     @PutMapping("/update/{id}")
     public String updateBidList(@PathVariable final Integer id,
                                 @RequestBody final BidListDTO bidListDTO) {
@@ -94,6 +99,7 @@ public class BidListApiController {
      * @param id the id
      * @return the bid list dto
      */
+    @ApiOperation(value = "Retrieve a BidList by its id from database")
     @GetMapping("/findById/{id}")
     public Optional<BidListDTO> findBidListById(
             @PathVariable final Integer id) {
@@ -106,6 +112,7 @@ public class BidListApiController {
      * Retrieve all BidLists.
      * @return a list of BidListDTOs
      */
+    @ApiOperation(value = "Retrieve all BidLists from database")
     @GetMapping("/findAll")
     public List<BidListDTO> findAllBidLists() {
         LOGGER.debug("GET request sent from the findAllBidLists"
@@ -119,6 +126,7 @@ public class BidListApiController {
      * @param id id of the BidList to delete
      * @return a message that indicates a successful operation
      */
+    @ApiOperation(value = "Delete an existing BidList from database")
     @DeleteMapping("/delete/{id}")
     public String deleteBidListById(@PathVariable final Integer id) {
         service.deleteById(id);
