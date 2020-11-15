@@ -4,7 +4,7 @@ import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
-import com.nnk.poseidon.unit.DataLoaderForUnitTests;
+import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -31,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("BidList view controller")
 @AutoConfigureWebMvc
 @SpringBootTest
-public class BidListControllerTest {
+class BidListControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -49,13 +47,13 @@ public class BidListControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        DataLoaderForUnitTests dataLoaderForUnitTests = new DataLoaderForUnitTests();
+        DataLoader dataLoaderForUnitTests = new DataLoader();
         bidListDTO = dataLoaderForUnitTests.setBidListDTO();
     }
 
     @DisplayName("List all bidLists in the bidList home page")
     @Test
-    public void home_shouldReturnHomePage() throws Exception {
+    void home_shouldReturnHomePage() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("bidListList"))
                 .andExpect(status().isOk());
@@ -65,7 +63,7 @@ public class BidListControllerTest {
 
     @DisplayName("Show the add form")
     @Test
-    public void addBidForm_shouldReturnAddForm() throws Exception {
+    void addBidForm_shouldReturnAddForm() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/add"))
                 .andExpect(MockMvcResultMatchers.model()
                         .attributeExists("bidList")).andExpect(status().isOk());
@@ -73,7 +71,7 @@ public class BidListControllerTest {
 
     @DisplayName("Post valid BidList successfully")
     @Test
-    public void givenValidBidListDto_whenValidIsCalled_thenRedirectToHome() throws Exception {
+    void givenValidBidListDto_whenValidIsCalled_thenRedirectToHome() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/bidList/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("type", bidListDTO.getType())
@@ -87,7 +85,7 @@ public class BidListControllerTest {
 
     @DisplayName("POST invalid will return the add form")
     @Test
-    public void givenInvalidBidListDto_whenValidIsCalled_thenRedirectToAddForm() throws Exception {
+    void givenInvalidBidListDto_whenValidIsCalled_thenRedirectToAddForm() throws Exception {
         bidListDTO.setType("");
         bidListDTO.setAccount("");
         mockMvc.perform(MockMvcRequestBuilders.post("/bidList/validate")
@@ -102,7 +100,7 @@ public class BidListControllerTest {
 
     @DisplayName("GET the update form")
     @Test
-    public void showUpdateForm_shouldReturnTheUpdateForm() throws Exception {
+    void showUpdateForm_shouldReturnTheUpdateForm() throws Exception {
         when(service.findBidListById(anyInt())).thenReturn(Optional.of(bidListDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/update?id=6"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("bidList"))
@@ -112,7 +110,7 @@ public class BidListControllerTest {
 
     @DisplayName("UPDATE valid BidList successfully")
     @Test
-    public void givenValidBidListDto_whenUpdateBidIsCalled_thenRedirectToHome() throws Exception {
+    void givenValidBidListDto_whenUpdateBidIsCalled_thenRedirectToHome() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/bidList/update/6")
                 .contentType(MediaType.TEXT_HTML)
                 .param("type", bidListDTO.getType())
@@ -126,7 +124,7 @@ public class BidListControllerTest {
 
     @DisplayName("UPDATE invalid BidList returns the Update form")
     @Test
-    public void givenInvalidBidListDto_whenUpdateBidIsCalled_thenRedirectToHome() throws Exception {
+    void givenInvalidBidListDto_whenUpdateBidIsCalled_thenRedirectToHome() throws Exception {
         bidListDTO.setType("");
         mockMvc.perform(MockMvcRequestBuilders.post("/bidList/update/6")
                 .contentType(MediaType.TEXT_HTML)
@@ -141,7 +139,7 @@ public class BidListControllerTest {
 
     @DisplayName("DELETE bidListSuccessfully")
     @Test
-    public void deleteBid_shouldRedirectToBidListList() throws Exception {
+    void deleteBid_shouldRedirectToBidListList() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/delete?id=1"))
                 .andExpect(redirectedUrl("/bidList/list"));
         verify(service, times(1)).deleteById(1);

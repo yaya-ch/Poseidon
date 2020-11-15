@@ -37,6 +37,12 @@ public class BidListController {
      */
     private static final Logger LOGGER =
             LogManager.getLogger(BidListController.class);
+
+    private static final String BID_LIST_ATTRIBUTE = "bidList";
+
+    private static final String REDIRECTION_TO_BID_LIST_LIST = "redirect:/bidList/list";
+
+    private static final String BID_LIST_LIST = "bidListList";
     /**
      * BidListService to inject.
      */
@@ -71,7 +77,7 @@ public class BidListController {
         LOGGER.debug("GET request sent from the bidListController"
                 + " to load all the BidLists");
         List<BidListDTO> bidListDTOList = service.findAll();
-        model.addAttribute("bidListList", bidListDTOList);
+        model.addAttribute(BID_LIST_LIST, bidListDTOList);
         return "bidList/list";
     }
 
@@ -86,7 +92,7 @@ public class BidListController {
         LOGGER.debug("GET request sent from the BidListController"
                 + " to display the add BidList form");
         BidListDTO bidListToSave = new BidListDTO();
-        model.addAttribute("bidList", bidListToSave);
+        model.addAttribute(BID_LIST_ATTRIBUTE, bidListToSave);
         return "bidList/add";
     }
 
@@ -101,7 +107,7 @@ public class BidListController {
     @PostMapping("/validate")
     public String validate(@Valid final BidListDTO bidListDTO,
                            final BindingResult result,
-                           final Model model) {
+                           final Model model){
         LOGGER.debug("POST request sent from the BidLIstController"
                 + " to save a new BidList");
         if (!result.hasFieldErrors()) {
@@ -114,11 +120,11 @@ public class BidListController {
             BidList bidListToSave =
                     converter.bidListDTOToBidListEntity(bidListDTO);
             service.save(bidListToSave);
-            model.addAttribute("bidListList", service.findAll());
-            return "redirect:/bidList/list";
+            model.addAttribute(BID_LIST_LIST, service.findAll());
+            return REDIRECTION_TO_BID_LIST_LIST;
         }
         LOGGER.error("Failed to validate The new BidList. AddForm reloaded");
-        model.addAttribute("bidList", bidListDTO);
+        model.addAttribute(BID_LIST_ATTRIBUTE, bidListDTO);
         return "bidList/add";
     }
 
@@ -135,7 +141,7 @@ public class BidListController {
         LOGGER.debug("GET request sent from the BidListController"
                 + " to display the update form");
         Optional<BidListDTO> bidListToUpdate = service.findBidListById(id);
-        model.addAttribute("bidList", bidListToUpdate.get());
+        model.addAttribute(BID_LIST_ATTRIBUTE, bidListToUpdate.get());
         return "bidList/update";
     }
 
@@ -160,12 +166,12 @@ public class BidListController {
             BidList bidListToUpdate =
                     converter.bidListDTOToBidListEntity(bidList);
             service.updateBidList(id, bidListToUpdate);
-            model.addAttribute("bidListList", service.findAll());
-            return "redirect:/bidList/list";
+            model.addAttribute(BID_LIST_LIST, service.findAll());
+            return REDIRECTION_TO_BID_LIST_LIST;
         }
         LOGGER.error("Failed to validate BidList {}. Update form reloaded",
                 bidList.getBidListId());
-        model.addAttribute("bidList", bidList);
+        model.addAttribute(BID_LIST_ATTRIBUTE, bidList);
         return "bidList/update";
     }
 
@@ -180,6 +186,6 @@ public class BidListController {
         LOGGER.debug("DELETE request sent from the BidListController"
                 + " to delete BidList {}", id);
         service.deleteById(id);
-        return "redirect:/bidList/list";
+        return REDIRECTION_TO_BID_LIST_LIST;
     }
 }

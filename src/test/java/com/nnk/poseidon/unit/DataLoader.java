@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  * @author Yahia CHERIFI
  */
 
-public class DataLoaderForUnitTests {
+public class DataLoader {
 
     /**
      * BidList.

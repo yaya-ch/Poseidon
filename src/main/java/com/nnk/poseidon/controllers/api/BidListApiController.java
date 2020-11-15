@@ -3,7 +3,6 @@ package com.nnk.poseidon.controllers.api;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +29,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bidList")
-@Api(description = "CRUD Operations on BidList")
 public class BidListApiController {
 
     /**
@@ -69,7 +67,8 @@ public class BidListApiController {
      */
     @ApiOperation(value = "Save a new BidList")
     @PostMapping("/add")
-    public String saveBidList(@RequestBody @Valid final BidListDTO bidListDTO) {
+    public String saveBidList(@RequestBody
+                              @Valid final BidListDTO bidListDTO) {
         LOGGER.debug("POST request sent from the saveBidList"
                 + " of the BidListApiController");
         bidListDTO.setRevisionName(null);
@@ -88,7 +87,8 @@ public class BidListApiController {
     @ApiOperation(value = "Update an existing BidList")
     @PutMapping("/update/{id}")
     public String updateBidList(@PathVariable final Integer id,
-                                @RequestBody @Valid final BidListDTO bidListDTO) {
+                                @RequestBody
+                                @Valid final BidListDTO bidListDTO) {
         LOGGER.debug("PUT request sent from the updateBidList"
                 + " of the BidListApiController to update BidList {}", id);
         service.updateBidList(id,

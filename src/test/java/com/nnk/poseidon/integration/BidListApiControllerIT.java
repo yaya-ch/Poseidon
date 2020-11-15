@@ -4,8 +4,8 @@ import com.nnk.poseidon.controllers.api.BidListApiController;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.repositories.BidListRepository;
-import com.nnk.poseidon.unit.DataLoaderForUnitTests;
 
+import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureWebMvc
 @SpringBootTest
 @Sql(scripts = {"/sqlScriptsForITs/scriptForIT.sql"})
-public class BidListApiControllerIT {
+class BidListApiControllerIT {
 
     @Autowired
     private BidListApiController apiController;
@@ -46,14 +46,14 @@ public class BidListApiControllerIT {
 
     @BeforeEach
     void setUp() {
-        DataLoaderForUnitTests dataLoaderForUnitTests = new DataLoaderForUnitTests();
+        DataLoader dataLoaderForUnitTests = new DataLoader();
         bidListDTO = dataLoaderForUnitTests.setBidListDTO();
     }
 
     @DisplayName("Find all BidLists")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void findAll_shouldRetrieveAllBidListsFromDataBase() {
+    void findAll_shouldRetrieveAllBidListsFromDataBase() {
         List<BidListDTO> retrieveAll = apiController.findAllBidLists();
         assertEquals(1, retrieveAll.size());
     }
@@ -61,7 +61,7 @@ public class BidListApiControllerIT {
     @DisplayName("FindById returns the correct BidList")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenExistingId_whenFindById_thenCorrectBidListShouldBeReturnedFromDB() {
+    void givenExistingId_whenFindById_thenCorrectBidListShouldBeReturnedFromDB() {
 
         Optional<BidListDTO> bidListToRetrieve = apiController.findBidListById(validBidListId);
         assertTrue(bidListToRetrieve.isPresent());
@@ -71,14 +71,14 @@ public class BidListApiControllerIT {
     @DisplayName("FindById throws exception when no id matches")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenNonExistingId_whenFindById_thenExceptionShouldBeThrown() {
+    void givenNonExistingId_whenFindById_thenExceptionShouldBeThrown() {
         assertThrows(RuntimeException.class, () -> apiController.findBidListById(invalidBidListId));
     }
 
     @DisplayName("Save BidList successfully")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenValidBidList_whenSaveBidListIsCalled_thenBidListShouldBeSaved() {
+    void givenValidBidList_whenSaveBidListIsCalled_thenBidListShouldBeSaved() {
         apiController.saveBidList(bidListDTO);
         List<BidListDTO> findAll = apiController.findAllBidLists();
         assertEquals(2, findAll.size());
@@ -87,7 +87,7 @@ public class BidListApiControllerIT {
     @DisplayName("Saving invalid BidList throws exception")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void giveInvalidBidList_whenSaveBidListIsCalled_thenExceptionShouldBeThrown() {
+    void giveInvalidBidList_whenSaveBidListIsCalled_thenExceptionShouldBeThrown() {
         bidListDTO.setAccount("");
         assertThrows(ConstraintViolationException.class, () -> apiController.saveBidList(bidListDTO));
     }
@@ -95,7 +95,7 @@ public class BidListApiControllerIT {
     @DisplayName("Update BidList successfully")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenValidBidList_whenUpdateBidListIsCalled_thenBidListShouldBeUpdated() {
+    void givenValidBidList_whenUpdateBidListIsCalled_thenBidListShouldBeUpdated() {
         bidListDTO.setAccount("This is the new account");
         apiController.updateBidList(validBidListId, bidListDTO);
         Optional<BidList> updatedBidList = repository.findById(1);
@@ -107,7 +107,7 @@ public class BidListApiControllerIT {
     @DisplayName("Updating invalid BidList throws an exception")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenInvalidBidList_whenUpdateBidListIsCalled_thenExceptionShouldBeThrown() {
+    void givenInvalidBidList_whenUpdateBidListIsCalled_thenExceptionShouldBeThrown() {
         bidListDTO.setAccount("");
         assertThrows(RuntimeException.class, () -> apiController.updateBidList(validBidListId, bidListDTO));
     }
@@ -115,7 +115,7 @@ public class BidListApiControllerIT {
     @DisplayName("Delete a BidList successfully")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenCorrectBidListId_whenDeleteById_thenBidListShouldBeDeleted() {
+    void givenCorrectBidListId_whenDeleteById_thenBidListShouldBeDeleted() {
         apiController.deleteBidListById(validBidListId);
         Optional<BidList> deletedBidList = repository.findById(validBidListId);
         assertFalse(deletedBidList.isPresent());
@@ -124,7 +124,7 @@ public class BidListApiControllerIT {
     @DisplayName("Delete BidList throws an exception when id is not valid")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
     @Test
-    public void givenInvalidBidListId_whenDeleteById_thenExceptionShouldBeThrown() {
+    void givenInvalidBidListId_whenDeleteById_thenExceptionShouldBeThrown() {
         assertThrows(RuntimeException.class, () -> apiController.updateBidList(invalidBidListId, bidListDTO));
     }
 }

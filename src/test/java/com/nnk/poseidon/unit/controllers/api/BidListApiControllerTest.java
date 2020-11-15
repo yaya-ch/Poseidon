@@ -1,11 +1,11 @@
 package com.nnk.poseidon.unit.controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nnk.poseidon.unit.DataLoaderForUnitTests;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
+import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -54,7 +54,7 @@ class BidListApiControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        DataLoaderForUnitTests dataLoaderForUnitTests = new DataLoaderForUnitTests();
+        DataLoader dataLoaderForUnitTests = new DataLoader();
         bidList = dataLoaderForUnitTests.setBidList();
     }
 
