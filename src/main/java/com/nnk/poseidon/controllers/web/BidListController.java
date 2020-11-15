@@ -117,6 +117,7 @@ public class BidListController {
             model.addAttribute("bidListList", service.findAll());
             return "redirect:/bidList/list";
         }
+        LOGGER.error("Failed to validate The new BidList. AddForm reloaded");
         model.addAttribute("bidList", bidListDTO);
         return "bidList/add";
     }
@@ -162,6 +163,8 @@ public class BidListController {
             model.addAttribute("bidListList", service.findAll());
             return "redirect:/bidList/list";
         }
+        LOGGER.error("Failed to validate BidList {}. Update form reloaded",
+                bidList.getBidListId());
         model.addAttribute("bidList", bidList);
         return "bidList/update";
     }
