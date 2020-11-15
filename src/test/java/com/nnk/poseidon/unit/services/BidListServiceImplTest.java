@@ -1,6 +1,6 @@
 package com.nnk.poseidon.unit.services;
 
-import com.nnk.poseidon.unit.DataLoaderForUnitTests;
+import com.nnk.poseidon.unit.DataLoader;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,14 +31,14 @@ class BidListServiceImplTest {
     @Mock
     private BidListConverter converter;
 
-    private DataLoaderForUnitTests dataLoaderForUnitTests;
+    private DataLoader dataLoaderForUnitTests;
 
     private BidList bidList;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         service = new BidListServiceImpl(repository, converter);
-        dataLoaderForUnitTests = new DataLoaderForUnitTests();
+        dataLoaderForUnitTests = new DataLoader();
         bidList = dataLoaderForUnitTests.setBidList();
     }
 
@@ -58,7 +59,7 @@ class BidListServiceImplTest {
         bidList1.setType("type");
         bidList1.setAccount("account");
         when(repository.findByAccountAndType("account", "type")).thenReturn(java.util.Optional.of(bidList));
-        assertThrows(RuntimeException.class, () -> service.save(bidList));
+        assertThrows(NoSuchElementException.class, () -> service.save(bidList));
     }
 
     @Test
@@ -75,7 +76,7 @@ class BidListServiceImplTest {
     @Test
     void givenNonExistingBidListToUpdate_whenUpdateMethodIsCalled_theExceptionShouldBeThrown() {
         when(repository.findById(anyInt())).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.updateBidList(1, bidList));
+        assertThrows(NoSuchElementException.class, () -> service.updateBidList(1, bidList));
     }
 
     @Test
@@ -88,7 +89,7 @@ class BidListServiceImplTest {
     @Test
     void givenIncorrectId_whenFidByIdISCalled_thenExceptionShouldBeThrown() {
         when(repository.findById(anyInt())).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.findBidListById(1));
+        assertThrows(NoSuchElementException.class, () -> service.findBidListById(1));
     }
 
     @Test
@@ -113,6 +114,6 @@ class BidListServiceImplTest {
     @Test
     void givenIncorrectId_WhenDeleteByIdIsCalled_thenExceptionShouldBeThrown() {
         when(repository.findById(anyInt())).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.deleteById(1));
+        assertThrows(NoSuchElementException.class, () -> service.deleteById(1));
     }
 }

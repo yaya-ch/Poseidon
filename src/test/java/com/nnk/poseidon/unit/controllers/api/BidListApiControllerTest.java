@@ -1,11 +1,11 @@
 package com.nnk.poseidon.unit.controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nnk.poseidon.unit.DataLoaderForUnitTests;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
+import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -54,7 +54,7 @@ class BidListApiControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        DataLoaderForUnitTests dataLoaderForUnitTests = new DataLoaderForUnitTests();
+        DataLoader dataLoaderForUnitTests = new DataLoader();
         bidList = dataLoaderForUnitTests.setBidList();
     }
 
@@ -69,6 +69,18 @@ class BidListApiControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("Saving invalid BidList returns BadRequest")
+    @Test
+    void givenNewInvalidBidList_whenSaveBidListIsCalled_thenResponseShouldBeBadRequest() throws Exception {
+        bidList.setType("");
+        when(service.save(any(BidList.class))).thenReturn(bidList);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/bidList/add")
+                .content(new ObjectMapper().writeValueAsString(bidList))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
     @DisplayName("Update BidList successfully")
     @Test
     void givenBidListToUpdate_whenUpdateBidListIsCalled_thenBidListShouldBeUpdated() throws Exception{
@@ -78,6 +90,18 @@ class BidListApiControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("Updating invalid BidList returns BadRequest")
+    @Test
+    void givenInvalidBidListToUpdate_whenUpdateBidListIsCalled_thenResponseShouldBeBadRequest() throws Exception{
+        bidList.setAccount("");
+        when(service.updateBidList(anyInt(), any(BidList.class))).thenReturn(bidList);
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/bidList/update/1")
+                .content(new ObjectMapper().writeValueAsString(bidList))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @DisplayName("Find BidList by id")

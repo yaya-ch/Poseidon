@@ -18,6 +18,10 @@
         <java.version>1.8</java.version>
         <surefire.version>3.0.0-M4</surefire.version>
         <maven-site-plugin.version>3.9.0</maven-site-plugin.version>
+        <sonar.login>525d97fabf8e99fc1f51e0bfefe8e5e47cad7102</sonar.login>
+        <sonar.projectKey>yaya-ch_Poseidon</sonar.projectKey>
+        <sonar.organization>yaya-ch</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>

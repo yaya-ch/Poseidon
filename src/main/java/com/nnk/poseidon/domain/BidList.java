@@ -320,6 +320,10 @@ public class BidList {
      * @param bRevisionDate date
      */
     public void setRevisionDate(final Timestamp bRevisionDate) {
-        this.revisionDate = new Timestamp(bRevisionDate.getTime());
+        if (bRevisionDate == null) {
+            this.revisionDate = null;
+        } else {
+            this.revisionDate = new Timestamp(bRevisionDate.getTime());
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.nnk.poseidon.controllers.api;
 import com.nnk.poseidon.converters.BidListConverter;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.services.BidListService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +29,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bidList")
-@Api(description = "CRUD Operations on BidList")
 public class BidListApiController {
 
     /**
@@ -68,9 +67,12 @@ public class BidListApiController {
      */
     @ApiOperation(value = "Save a new BidList")
     @PostMapping("/add")
-    public String saveBidList(@RequestBody final BidListDTO bidListDTO) {
+    public String saveBidList(@RequestBody
+                              @Valid final BidListDTO bidListDTO) {
         LOGGER.debug("POST request sent from the saveBidList"
                 + " of the BidListApiController");
+        bidListDTO.setRevisionName(null);
+        bidListDTO.setRevisionDate(null);
         service.save(converter.bidListDTOToBidListEntity(bidListDTO));
         return "BidList saved successfully";
     }
@@ -85,7 +87,8 @@ public class BidListApiController {
     @ApiOperation(value = "Update an existing BidList")
     @PutMapping("/update/{id}")
     public String updateBidList(@PathVariable final Integer id,
-                                @RequestBody final BidListDTO bidListDTO) {
+                                @RequestBody
+                                @Valid final BidListDTO bidListDTO) {
         LOGGER.debug("PUT request sent from the updateBidList"
                 + " of the BidListApiController to update BidList {}", id);
         service.updateBidList(id,

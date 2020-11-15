@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -28,6 +29,8 @@ public class BidListServiceImpl implements BidListService {
      */
     private static final Logger LOGGER =
             LogManager.getLogger(BidListServiceImpl.class);
+
+    private static final String ERROR_MESSAGE = "No matching element found";
 
     /**
      * BidListRepository to inject.
@@ -67,7 +70,7 @@ public class BidListServiceImpl implements BidListService {
             LOGGER.error("Failed to save a new BidList."
                             + " BidList {} matches the provided one",
                     bidList.getBidListId());
-            throw new RuntimeException("Failed to save the new BidList");
+            throw new NoSuchElementException("Failed to save the new BidList");
         } else {
             LOGGER.info("BidList saved successfully: {}",
                     bidList.getBidListId());
@@ -89,8 +92,8 @@ public class BidListServiceImpl implements BidListService {
         if (!checkForBidList.isPresent()) {
             LOGGER.error("Failed to load BidList {}."
                     + " No matching element found", id);
-            throw new RuntimeException("Failed to update BidList."
-                    + " No matching element found");
+            throw new NoSuchElementException("Failed to update BidList."
+                    + ERROR_MESSAGE);
         } else {
             bidList.setBidListId(checkForBidList.get().getBidListId());
             LOGGER.info("BidList {} updated successfully", id);
@@ -110,8 +113,8 @@ public class BidListServiceImpl implements BidListService {
         if (!checkForExistingBidList.isPresent()) {
             LOGGER.error("Failed to load BidList {}."
                     + " No matching Item found", id);
-            throw new RuntimeException("Failed to load BidList."
-                    + " No matching item found");
+            throw new NoSuchElementException("Failed to load BidList."
+                    + ERROR_MESSAGE);
         } else {
             LOGGER.info("BidList {} loaded successfully.", id);
             return Optional.ofNullable(converter
@@ -139,8 +142,8 @@ public class BidListServiceImpl implements BidListService {
         Optional<BidList> checkForBidList = repository.findById(id);
         if (!checkForBidList.isPresent()) {
             LOGGER.error("Failed to delete BidList {}."
-                    + " No matching element found", id);
-            throw new RuntimeException("No matching found");
+                    + ERROR_MESSAGE, id);
+            throw new NoSuchElementException("No matching found");
         } else {
             LOGGER.info("BidList {} deleted successfully", id);
             repository.deleteById(id);
