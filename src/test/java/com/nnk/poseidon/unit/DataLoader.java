@@ -1,7 +1,9 @@
 package com.nnk.poseidon.unit;
 
 import com.nnk.poseidon.domain.BidList;
+import com.nnk.poseidon.domain.CurvePoint;
 import com.nnk.poseidon.dto.BidListDTO;
+import com.nnk.poseidon.dto.CurvePointDTO;
 
 import java.sql.Timestamp;
 
@@ -14,21 +16,11 @@ import java.sql.Timestamp;
 public class DataLoader {
 
     /**
-     * BidList.
-     */
-    private BidList bidList;
-
-    /**
-     * BidListDTO.
-     */
-    private BidListDTO bidListDTO;
-
-    /**
      * set a new BidList.
      * @return bidList
      */
     public BidList setBidList() {
-        bidList = new BidList();
+        BidList bidList = new BidList();
         bidList.setType("type");
         bidList.setAccount("account");
         bidList.setBidQuantity(22.0);
@@ -58,7 +50,7 @@ public class DataLoader {
      * @return bidListDTO
      */
     public BidListDTO setBidListDTO() {
-        bidListDTO = new BidListDTO();
+        BidListDTO bidListDTO = new BidListDTO();
         bidListDTO.setType("DTO type");
         bidListDTO.setAccount("DTO account");
         bidListDTO.setBidQuantity(100.0);
@@ -81,5 +73,32 @@ public class DataLoader {
         bidListDTO.setSourceListId("2");
         bidListDTO.setSide("DTO side");
         return bidListDTO;
+    }
+
+    /**
+     * set a new CurvePoint.
+     * @return curvePoint
+     */
+    public CurvePoint setCurvePoint() {
+        CurvePoint curvePoint = new CurvePoint();
+        curvePoint.setCurveId(1);
+        curvePoint.setAsOfDate(new Timestamp(System.currentTimeMillis()));
+        curvePoint.setTerm(100.0);
+        curvePoint.setValue(50.0);
+        return curvePoint;
+    }
+
+    /**
+     * set a new CurvePointDTO.
+     * @return curvePointDTO
+     */
+    public CurvePointDTO setCurvePointDTO() {
+        CurvePointDTO curvePointDTO = new CurvePointDTO();
+        curvePointDTO.setCurveId(2);
+        curvePointDTO.setAsOfDate(new Timestamp(System.currentTimeMillis()));
+        curvePointDTO.setTerm(200.0);
+        curvePointDTO.setValue(100.0);
+        curvePointDTO.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        return curvePointDTO;
     }
 }
