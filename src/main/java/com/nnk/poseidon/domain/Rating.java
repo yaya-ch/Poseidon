@@ -2,8 +2,10 @@ package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * This class groups rating related information.
@@ -24,6 +28,7 @@ import javax.persistence.Column;
 @Entity
 @Table(name = "rating")
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
@@ -41,13 +46,17 @@ public class Rating {
     /**
      * moody's rating.
      */
+    @NonNull
+    @NotBlank(message = "Moody's Rating is mandatory")
     @Column(name = "moodys_rating",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String moodysRating;
 
     /**
-     * sand p rating.
+     * s and p rating.
      */
+    @NonNull
+    @NotBlank(message = "S & P rating is mandatory")
     @Column(name = "sand_p_rating",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String sandPRating;
@@ -55,6 +64,8 @@ public class Rating {
     /**
      * fitch rating.
      */
+    @NonNull
+    @NotBlank(message = "Fitch Rating is mandatory")
     @Column(name = "fitch_rating",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String fitchRating;
@@ -62,23 +73,8 @@ public class Rating {
     /**
      * order number.
      */
+    @NonNull
+    @NotNull
     @Column(name = "order_number")
     private Integer orderNumber;
-
-    /**
-     * Class constructor.
-     * @param mRating moodysRating
-     * @param sRating sandPRating
-     * @param fRating fitchRating
-     * @param orderNum orderNumber
-     */
-    public Rating(final String mRating,
-                  final String sRating,
-                  final String fRating,
-                  final Integer orderNum) {
-        this.moodysRating = mRating;
-        this.sandPRating = sRating;
-        this.fitchRating = fRating;
-        this.orderNumber = orderNum;
-    }
 }
