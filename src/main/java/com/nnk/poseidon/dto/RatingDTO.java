@@ -2,7 +2,6 @@ package com.nnk.poseidon.dto;
 
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

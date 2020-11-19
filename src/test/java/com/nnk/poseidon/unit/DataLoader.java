@@ -2,8 +2,10 @@ package com.nnk.poseidon.unit;
 
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.domain.CurvePoint;
+import com.nnk.poseidon.domain.Rating;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.dto.CurvePointDTO;
+import com.nnk.poseidon.dto.RatingDTO;
 
 import java.sql.Timestamp;
 
@@ -101,5 +103,25 @@ public class DataLoader {
         curvePointDTO.setValue(100.0);
         curvePointDTO.setCreationDate(new Timestamp(System.currentTimeMillis()));
         return curvePointDTO;
+    }
+
+    public Rating setRating() {
+        Rating rating = new Rating();
+        rating.setId(1);
+        rating.setMoodysRating("Moody's rating");
+        rating.setSandPRating("S&P rating");
+        rating.setFitchRating("Fitch rating");
+        rating.setOrderNumber(1255);
+        return rating;
+    }
+
+    public RatingDTO setRatingDTO() {
+        RatingDTO ratingDTO = new RatingDTO();
+        ratingDTO.setId(1);
+        ratingDTO.setMoodysRating("Moody's rating");
+        ratingDTO.setSandPRating("S&P rating");
+        ratingDTO.setFitchRating("Fitch rating");
+        ratingDTO.setOrderNumber(1255);
+        return ratingDTO;
     }
 }
