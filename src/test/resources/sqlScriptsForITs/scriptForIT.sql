@@ -35,4 +35,17 @@ VALUES ( 1, 'Account', 'Type', 100.0, 100.0, 200.0, 200.0,
         'Benchmark', '2020-11-15T00:11:22', 'Commentary', 'Security', 'Status',
         'Trader', 'Book', 'Creation name', '2020-11-15T00:15:00',
         'Revision name', '2020-11-15T07:15:00', 'Deal name',
-        'Deal type', '12', 'Side')
+        'Deal type', '12', 'Side');
+
+DROP TABLE IF EXISTS curve_point;
+CREATE TABLE curve_point(
+    curve_point_id INT NOT NULL AUTO_INCREMENT,
+    curve_id INT NOT NULL,
+    as_of_date TIMESTAMP,
+    term DOUBLE NOT NULL,
+    value DOUBLE NOT NULL,
+    creation_date TIMESTAMP,
+    PRIMARY KEY(curve_point_id)
+);
+INSERT INTO curve_point(curve_point_id, curve_id, as_of_date, term, value, creation_date)
+VALUES ( 1, 22, '2020-11-16T00:11:22', 22.1, 22.2, '2020-11-15T00:15:00')

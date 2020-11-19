@@ -85,6 +85,7 @@ public class DataLoader {
         curvePoint.setAsOfDate(new Timestamp(System.currentTimeMillis()));
         curvePoint.setTerm(100.0);
         curvePoint.setValue(50.0);
+        curvePoint.setCreationDate(new Timestamp(System.currentTimeMillis()));
         return curvePoint;
     }
 
