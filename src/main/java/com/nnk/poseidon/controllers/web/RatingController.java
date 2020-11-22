@@ -1,4 +1,4 @@
-package com.nnk.poseidon.controllers;
+package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.domain.Rating;
 import org.springframework.stereotype.Controller;
