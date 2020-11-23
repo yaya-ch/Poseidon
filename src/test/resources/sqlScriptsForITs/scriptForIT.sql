@@ -48,4 +48,16 @@ CREATE TABLE curve_point(
     PRIMARY KEY(curve_point_id)
 );
 INSERT INTO curve_point(curve_point_id, curve_id, as_of_date, term, value, creation_date)
-VALUES ( 1, 22, '2020-11-16T00:11:22', 22.1, 22.2, '2020-11-15T00:15:00')
+VALUES ( 1, 22, '2020-11-16T00:11:22', 22.1, 22.2, '2020-11-15T00:15:00');
+
+DROP TABLE IF EXISTS rating;
+CREATE TABLE rating(
+    rating_id INT NOT NULL AUTO_INCREMENT,
+    moodys_rating VARCHAR NOT NULL ,
+    s_and_p_rating VARCHAR NOT NULL,
+    fitch_rating VARCHAR NOT NULL,
+    order_number VARCHAR NOT NULL,
+    PRIMARY KEY(rating_id)
+);
+INSERT INTO rating(rating_id, moodys_rating, s_and_p_rating, fitch_rating, order_number)
+VALUES (5, 'Moody s Rating', 'S and P Rating', 'Fitch', 12)
