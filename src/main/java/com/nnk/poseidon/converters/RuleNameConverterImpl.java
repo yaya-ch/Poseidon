@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class implements the RatingConverter.
+ * This class implements the RuleNameConverter.
  *
  * @author Yahia CHERIF
- * @see RatingConverter
+ * @see RuleNameConverter
  */
 @Component
 public class RuleNameConverterImpl implements RuleNameConverter {

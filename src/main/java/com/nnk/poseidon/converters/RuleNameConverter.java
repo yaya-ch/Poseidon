@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * This interface provides some abstract methods that allow.
- * conversion from/to RuleName entity/RatingDTO
+ * conversion from/to RuleName entity/RuleNameDTO
  *
  * @author Yahia CHERIFI
  */
