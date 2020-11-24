@@ -3,9 +3,11 @@ package com.nnk.poseidon.unit;
 import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.domain.CurvePoint;
 import com.nnk.poseidon.domain.Rating;
+import com.nnk.poseidon.domain.RuleName;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.dto.CurvePointDTO;
 import com.nnk.poseidon.dto.RatingDTO;
+import com.nnk.poseidon.dto.RuleNameDTO;
 
 import java.sql.Timestamp;
 
@@ -105,6 +107,10 @@ public class DataLoader {
         return curvePointDTO;
     }
 
+    /**
+     * set a new Rating.
+     * @return rating
+     */
     public Rating setRating() {
         Rating rating = new Rating();
         rating.setId(1);
@@ -115,6 +121,10 @@ public class DataLoader {
         return rating;
     }
 
+    /**
+     * set a new RatingDTO.
+     * @return ratingDTO
+     */
     public RatingDTO setRatingDTO() {
         RatingDTO ratingDTO = new RatingDTO();
         ratingDTO.setId(1);
@@ -123,5 +133,37 @@ public class DataLoader {
         ratingDTO.setFitchRating("Fitch rating");
         ratingDTO.setOrderNumber(1255);
         return ratingDTO;
+    }
+
+    /**
+     * set a new RuleName.
+     * @return ruleName
+     */
+    public RuleName setRuleName() {
+        RuleName ruleName = new RuleName();
+        ruleName.setId(1);
+        ruleName.setName("rule name");
+        ruleName.setDescription("rule name description");
+        ruleName.setJson("json");
+        ruleName.setTemplate("template");
+        ruleName.setSqlStr("sql str");
+        ruleName.setSqlPart("sql part");
+        return ruleName;
+    }
+
+    /**
+     * set a new RuleNameDTO.
+     * @return ruleNameDTO
+     */
+    public RuleNameDTO setRuleNameDTO() {
+        RuleNameDTO ruleNameDTO = new RuleNameDTO();
+        ruleNameDTO.setId(1);
+        ruleNameDTO.setName("DTO rule name");
+        ruleNameDTO.setDescription("DTO rule name description");
+        ruleNameDTO.setJson("DTO json");
+        ruleNameDTO.setTemplate("DTO template");
+        ruleNameDTO.setSqlStr("DTO sql str");
+        ruleNameDTO.setSqlPart("DTO sql part");
+        return ruleNameDTO;
     }
 }
