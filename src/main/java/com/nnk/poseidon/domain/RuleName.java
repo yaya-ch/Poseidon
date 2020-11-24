@@ -2,10 +2,12 @@ package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NonNull;
 import lombok.ToString;
 
 import javax.persistence.Entity;
@@ -14,9 +16,10 @@ import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
 
 /**
- * This class groups all RuleNAme related information.
+ * This class groups all RuleName related information.
  *
  * @author Yahia CHERIFI
  */
@@ -24,6 +27,7 @@ import javax.persistence.Column;
 @Entity
 @Table(name = "rule_name")
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
@@ -41,6 +45,8 @@ public class RuleName {
     /**
      * name.
      */
+    @NonNull
+    @NotBlank(message = "Name is mandatory")
     @Column(name = "name",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String name;
@@ -48,6 +54,8 @@ public class RuleName {
     /**
      * description.
      */
+    @NonNull
+    @NotBlank(message = "Description is mandatory")
     @Column(name = "description",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String description;
@@ -55,6 +63,8 @@ public class RuleName {
     /**
      * json.
      */
+    @NonNull
+    @NotBlank(message = "Json is mandatory")
     @Column(name = "json",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String json;
@@ -62,6 +72,8 @@ public class RuleName {
     /**
      * template.
      */
+    @NonNull
+    @NotBlank(message = "Template is mandatory")
     @Column(name = "template",
             length = ConstantNumbers.FIVE_HUNDREDS_AND_TWELVE)
     private String template;
@@ -69,6 +81,8 @@ public class RuleName {
     /**
      * sqlStr.
      */
+    @NonNull
+    @NotBlank(message = "SqlStr is mandatory")
     @Column(name = "sql_str",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String sqlStr;
@@ -76,30 +90,9 @@ public class RuleName {
     /**
      * sqlPart.
      */
+    @NonNull
+    @NotBlank(message = "SqlPart is mandatory")
     @Column(name = "sql_part",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String sqlPart;
-
-    /**
-     * Class constructor.
-     * @param rName name
-     * @param rDescription description
-     * @param rJson json
-     * @param rTemplate template
-     * @param rSqlStr sqlStr
-     * @param rSqlPart sqlPart
-     */
-    public RuleName(final String rName,
-                    final String rDescription,
-                    final String rJson,
-                    final String rTemplate,
-                    final String rSqlStr,
-                    final String rSqlPart) {
-        this.name = rName;
-        this.description = rDescription;
-        this.json = rJson;
-        this.template = rTemplate;
-        this.sqlStr = rSqlStr;
-        this.sqlPart = rSqlPart;
-    }
 }
