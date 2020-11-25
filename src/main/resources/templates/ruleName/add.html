@@ -1,26 +1,44 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" 
-	  xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Home</title>
-<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+    <meta charset="utf-8"/>
+    <title>Home</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
 </head>
 <body>
 <div class="container">
 
-	<div class="row">
-		<h2>Add New Rule</h2>
-	</div>
+    <div class="row">
+        <h2>Add New Rule</h2>
+    </div>
 
-	<div class="row">
-		<form action="#" th:action="@{/ruleName/validate}" th:object="${ruleName}" method="post" class="form-horizontal" style="width: 100%">
-			<!--
-			TODO: Create a form to input the values of RuleName, there are 2 buttons: Save data and Cancel to the list RuleName
-			 -->
+    <div class="row">
+        <form action="#" th:action="@{/ruleName/validate}"
+              th:object="${ruleName}" method="post"
+              class="form-horizontal" style="width: 100%">
+            <input type="text" th:field="*{name}"
+                   class="form-control mb-4 col-4" placeholder="Name">
+            <input type="text" th:field="*{description}"
+                   class="form-control mb-4 col-4" placeholder="Description">
+            <input type="text" th:field="*{json}"
+                   class="form-control mb-4 col-4" placeholder="Json">
+            <input type="text" th:field="*{template}"
+                   class="form-control mb-4 col-4" placeholder="Template">
+            <input type="text" th:field="*{sqlStr}"
+                   class="form-control mb-4 col-4" placeholder="SQL Str">
+            <input type="text" th:field="*{sqlPart}"
+                   class="form-control mb-4 col-4" placeholder="SQL Part">
 
-		</form>
-	</div>
+            <button type="submit" class="btn btn-info col-2">Save</button>
+
+            <a class="btn btn-danger col-2" th:href="@{/ruleName/list}"
+               role="button"
+               th:onclick="if (!(confirm('Are you sure you want to cancel?'))) return false">
+                Cancel
+            </a>
+        </form>
+    </div>
 
 </div>
 </body>
