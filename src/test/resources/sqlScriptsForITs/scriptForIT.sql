@@ -60,4 +60,18 @@ CREATE TABLE rating(
     PRIMARY KEY(rating_id)
 );
 INSERT INTO rating(rating_id, moodys_rating, s_and_p_rating, fitch_rating, order_number)
-VALUES (5, 'Moody s Rating', 'S and P Rating', 'Fitch', 12)
+VALUES (5, 'Moody s Rating', 'S and P Rating', 'Fitch', 12);
+
+DROP TABLE IF EXISTS rule_name;
+CREATE TABLE rule_name(
+    rule_name_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR NOT NULL,
+    description VARCHAR NOT NULL,
+    json VARCHAR NOT NULL,
+    template VARCHAR NOT NULL,
+    sql_str VARCHAR NOT NULL,
+    sql_part VARCHAR NOT NULL,
+    PRIMARY KEY(rule_name_id)
+);
+INSERT INTO rule_name(rule_name_id, name, description, json, template, sql_str, sql_part)
+VALUES (12, 'Name', 'Description', 'json', 'template', 'sql str', 'sql part')
