@@ -167,7 +167,11 @@ public class TradeDTO {
      * @return revision date
      */
     public Timestamp getRevisionDate() {
-        return new Timestamp(revisionDate.getTime());
+        if (revisionDate == null) {
+            return null;
+        } else {
+            return new Timestamp(revisionDate.getTime());
+        }
     }
 
     /**
@@ -175,6 +179,10 @@ public class TradeDTO {
      * @param tRevisionDate date
      */
     public void setRevisionDate(final Timestamp tRevisionDate) {
-        this.revisionDate = new Timestamp(tRevisionDate.getTime());
+        if (tRevisionDate == null) {
+            this.revisionDate = null;
+        } else {
+            this.revisionDate = new Timestamp(tRevisionDate.getTime());
+        }
     }
 }
