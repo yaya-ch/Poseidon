@@ -1,13 +1,7 @@
 package com.nnk.poseidon.unit;
 
-import com.nnk.poseidon.domain.BidList;
-import com.nnk.poseidon.domain.CurvePoint;
-import com.nnk.poseidon.domain.Rating;
-import com.nnk.poseidon.domain.RuleName;
-import com.nnk.poseidon.dto.BidListDTO;
-import com.nnk.poseidon.dto.CurvePointDTO;
-import com.nnk.poseidon.dto.RatingDTO;
-import com.nnk.poseidon.dto.RuleNameDTO;
+import com.nnk.poseidon.domain.*;
+import com.nnk.poseidon.dto.*;
 
 import java.sql.Timestamp;
 
@@ -165,5 +159,63 @@ public class DataLoader {
         ruleNameDTO.setSqlStr("DTO sql str");
         ruleNameDTO.setSqlPart("DTO sql part");
         return ruleNameDTO;
+    }
+
+    /**
+     * Set a new Trade.
+     * @return trade instance
+     */
+    public Trade setTrade() {
+        Trade trade = new Trade();
+        trade.setTradeId(22);
+        trade.setAccount("trade account");
+        trade.setType("Trade type");
+        trade.setBuyQuantity(23.0);
+        trade.setSellQuantity(12.0);
+        trade.setSellPrice(10.0);
+        trade.setBenchmark("Trade benchmark");
+        trade.setTradeDate(new Timestamp(System.currentTimeMillis()));
+        trade.setSecurity("Trade is secure");
+        trade.setStatus("Trade status");
+        trade.setTrader("Trader");
+        trade.setBook("Trade book");
+        trade.setCreationName("Trade creation name");
+        trade.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        trade.setRevisionName("Trade revision name");
+        trade.setRevisionDate(new Timestamp((System.currentTimeMillis())));
+        trade.setDealName("Trade deal name");
+        trade.setDealType("Trade deal type");
+        trade.setSourceListId("Source List ID");
+        trade.setSide("Trade Side");
+        return trade;
+    }
+
+    /**
+     * Set a new TradeDTO
+     * @return tradeDTO instance
+     */
+    public TradeDTO setTradeDTO() {
+        TradeDTO tradeDTO = new TradeDTO();
+        tradeDTO.setTradeId(33);
+        tradeDTO.setAccount("TradeDTO account");
+        tradeDTO.setType("TradeDTO type");
+        tradeDTO.setBuyQuantity(29.0);
+        tradeDTO.setSellQuantity(19.0);
+        tradeDTO.setSellPrice(15.0);
+        tradeDTO.setBenchmark("TradeDTO benchmark");
+        tradeDTO.setTradeDate(new Timestamp(System.currentTimeMillis()));
+        tradeDTO.setSecurity("TradeDTO is secure");
+        tradeDTO.setStatus("TradeDTO status");
+        tradeDTO.setTrader("TradeDTO Trader");
+        tradeDTO.setBook("TradeDTO book");
+        tradeDTO.setCreationName("TradeDTO creation name");
+        tradeDTO.setCreationDate(new Timestamp(System.currentTimeMillis()));
+        tradeDTO.setRevisionName("TradeDTO revision name");
+        tradeDTO.setRevisionDate(new Timestamp((System.currentTimeMillis())));
+        tradeDTO.setDealName("TradeDTO deal name");
+        tradeDTO.setDealType("TradeDTO deal type");
+        tradeDTO.setSourceListId("TradDTO Source List ID");
+        tradeDTO.setSide("TradeDTO Side");
+        return tradeDTO;
     }
 }
