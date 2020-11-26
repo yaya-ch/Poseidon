@@ -1,10 +1,12 @@
 package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
+import lombok.RequiredArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NonNull;
 import lombok.ToString;
 
 import javax.persistence.Entity;
@@ -25,6 +27,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "trade")
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
@@ -42,6 +45,7 @@ public class Trade {
     /**
      * account.
      */
+    @NonNull
     @NotNull
     @NotBlank
     @Column(name = "account", length = ConstantNumbers.THIRTY)
@@ -50,6 +54,7 @@ public class Trade {
     /**
      * type.
      */
+    @NonNull
     @NotNull
     @NotBlank
     @Column(name = "type", length = ConstantNumbers.THIRTY)
@@ -231,17 +236,6 @@ public class Trade {
     }
 
     /**
-     * Class constructor.
-     * @param tAccount account
-     * @param tType type
-     */
-    public Trade(@NotNull @NotBlank final String tAccount,
-                 @NotNull @NotBlank final String tType) {
-        this.account = tAccount;
-        this.type = tType;
-    }
-
-    /**
      * tradeDate getter.
      * @return trade date
      */
@@ -286,7 +280,11 @@ public class Trade {
      * @return revision date
      */
     public Timestamp getRevisionDate() {
-        return new Timestamp(revisionDate.getTime());
+        if (revisionDate == null) {
+            return null;
+        } else {
+            return new Timestamp(revisionDate.getTime());
+        }
     }
 
     /**
@@ -294,6 +292,10 @@ public class Trade {
      * @param tRevisionDate date
      */
     public void setRevisionDate(final Timestamp tRevisionDate) {
-        this.revisionDate = new Timestamp(tRevisionDate.getTime());
+        if (tRevisionDate == null) {
+            this.revisionDate = null;
+        } else {
+            this.revisionDate = new Timestamp(tRevisionDate.getTime());
+        }
     }
 }
