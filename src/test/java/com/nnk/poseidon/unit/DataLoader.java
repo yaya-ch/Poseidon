@@ -218,4 +218,32 @@ public class DataLoader {
         tradeDTO.setSide("TradeDTO Side");
         return tradeDTO;
     }
+
+    /**
+     * Set a new User.
+     * @return a user instance
+     */
+    public User setUser() {
+        User user = new User();
+        user.setId(9);
+        user.setUsername("User Name");
+        user.setPassword("user123");
+        user.setFullName("I m user");
+        user.setRole("USER");
+        return user;
+    }
+
+    /**
+     * Set a new UserDTO.
+     * @return a userDTO instance
+     */
+    public UserDTO setUserDTO() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(19);
+        userDTO.setUsername("UserDTO name");
+        userDTO.setPassword("admin123");
+        userDTO.setFullName("I m userDTO");
+        userDTO.setRole("ADMIN");
+        return userDTO;
+    }
 }
