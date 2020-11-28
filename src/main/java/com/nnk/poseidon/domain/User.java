@@ -2,6 +2,8 @@ package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,6 +26,7 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @Table(name = "user")
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
@@ -41,6 +44,7 @@ public class User {
     /**
      * user name.
      */
+    @NonNull
     @NotBlank(message = "Username is mandatory")
     @Column(name = "username",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
@@ -49,6 +53,7 @@ public class User {
     /**
      * user password.
      */
+    @NonNull
     @NotBlank(message = "Password is mandatory")
     @Column(name = "password",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
@@ -57,6 +62,7 @@ public class User {
     /**
      * user full name.
      */
+    @NonNull
     @NotBlank(message = "FullName is mandatory")
     @Column(name = "full_name",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
@@ -65,6 +71,7 @@ public class User {
     /**
      * user role.
      */
+    @NonNull
     @NotBlank(message = "Role is mandatory")
     @Column(name = "role",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
