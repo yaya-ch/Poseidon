@@ -5,6 +5,7 @@ import com.nnk.poseidon.dto.UserDTO;
 import com.nnk.poseidon.exceptions.ResourceAlreadyExistsException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The interface TradeService.
@@ -23,7 +24,7 @@ public interface UserService {
      * @param id the id of the User
      * @return the User if found
      */
-    UserDTO findById(Integer id);
+    Optional<UserDTO> findById(Integer id);
 
     /**
      * Find all the Users.

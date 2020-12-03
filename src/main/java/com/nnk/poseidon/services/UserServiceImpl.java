@@ -59,10 +59,11 @@ public class UserServiceImpl implements UserService {
      * @return the User if found
      */
     @Override
-    public UserDTO findById(final Integer id) {
+    public Optional<UserDTO> findById(final Integer id) {
         Optional<User> findUser = repository.findById(id);
         if (findUser.isPresent()) {
-            return converter.userEntityToUserDTOConverter(findUser.get());
+            return Optional.ofNullable(
+                    converter.userEntityToUserDTOConverter(findUser.get()));
         } else {
             throw new NoSuchElementException("No user found");
         }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This controller provides api endpoints.
@@ -77,7 +78,7 @@ public class UserApiController {
      */
     @ApiOperation(value = "Retrieve a User by its id from database")
     @GetMapping("/findById/{id}")
-    public UserDTO findUserById(@PathVariable final Integer id) {
+    public Optional<UserDTO> findUserById(@PathVariable final Integer id) {
         LOGGER.debug("GET request sent from the UserApiController to"
                 + " find a User by id {}", id);
         return service.findById(id);

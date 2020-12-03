@@ -53,7 +53,7 @@ class UserServiceImplTest {
     void givenCorrectUserId_whenFindById_thenUserShouldBeReturned() {
         when(repository.findById(anyInt())).thenReturn(Optional.of(user));
         when(converter.userEntityToUserDTOConverter(any(User.class))).thenReturn(userDTO);
-        UserDTO expected = service.findById(1);
+        Optional<UserDTO> expected = service.findById(1);
         assertNotNull(expected);
         verify(repository, times(1)).findById(1);
     }
