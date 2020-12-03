@@ -118,3 +118,19 @@ VALUES (44, 'trade db account', 'trade db type', 100.0,
         '2020-11-27T03:15:22', 'trade db revision name',
         '2020-11-16T00:11:22', 'trade db deal name', 'trade db deal type',
         'trade db source list id', 'trade db side');
+
+DROP TABLE IF EXISTS user;
+CREATE TABLE user(
+    user_id INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR NOT NULL,
+    password VARCHAR NOT NULL,
+    full_name VARCHAR NOT NULL,
+    role VARCHAR NOT NULL,
+    PRIMARY KEY (user_id)
+);
+
+INSERT INTO user(user_id, username, password, full_name, role)
+VALUES (666, 'db user name',
+        '$2y$15$txwznfFr61BpIrGmoIemyu8vGL2nsGufvqimtwrTmrNP4NJQvZlGK ',
+        'db full name', 'ADMIN')
+//password is test123 before encrypting it with bcrypt(strength = 15)
