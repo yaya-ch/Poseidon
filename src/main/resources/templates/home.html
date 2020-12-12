@@ -1,13 +1,51 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title> Spring Boot </title>
-    <link rel="stylesheet" href="/css/styles.css"/>
+    <meta charset="utf-8"/>
+    <title>Home</title>
+    <link rel="stylesheet" th:href="@{../css/home_style.css}">
+    <link rel="stylesheet" href="../static/css/home_style.css">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
 </head>
 <body>
-<h3> HOME PAGE </h3>
-<p>
-    <a href="/login">Login</a> or create one <a href="/user/list">User management</a>
-</p>
+<div class="container">
+    <div class="row bg-dark text-light div_position">
+        <div class="text-right p-2 right_p">
+            <a class="btn btn-primary" href="/login" role="button">Login</a>&nbsp;|&nbsp;
+            <a class="btn btn-primary" href="/user/list" role="button">User management</a>
+        </div>
+    </div>
+
+    <div class="text-center home_bg">
+        <h2 class="m-3">Welcome to Poseidon</h2>
+    </div>
+    <div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Donec commodo commodo consectetur.
+            Vestibulum sit amet erat sit amet arcu faucibus eleifend.
+            Mauris et nunc id augue euismod porta. Curabitur a tincidunt odio.
+            Nam vulputate tortor eu sem dictum rhoncus. Aenean urna erat,
+            aliquam quis dignissim eu, posuere sit amet dui. Suspendisse rutrum, ligula
+            sed ullamcorper pulvinar, lacus ipsum maximus elit, molestie dignissim turpis
+            orci vel ex. Aenean sed odio vitae justo laoreet porta.</p>
+    </div>
+    <div class="d-flex flex-row bg-dark text-light text-center">
+        <div class="w-33">
+            <h3 class="text-info">About us</h3>
+            <p class="p-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="w-33">
+            <h3 class="text-info">Our values</h3>
+            <p class="p-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="w-33">
+            <h3 class="text-info">Something else</h3>
+            <p class="p-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+    </div>
+</div>
 </body>
 </html>
