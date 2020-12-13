@@ -1,5 +1,7 @@
 package com.nnk.poseidon.controllers.web;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -15,12 +17,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     /**
+     * Class logger.
+     */
+    private static final Logger LOGGER =
+            LogManager.getLogger(HomeController.class);
+    /**
      * The Poseidon home page.
      *
      * @return an html file
      */
     @GetMapping("/")
     public String home() {
+        LOGGER.debug("GET request sent from the HomeController"
+                + " to load the home page");
         return "home";
     }
 
@@ -31,6 +40,8 @@ public class HomeController {
      */
     @GetMapping("/admin/home")
     public String adminHome() {
+        LOGGER.debug("GET request sent from the HomeController"
+                + " to load the admin home page");
         return "redirect:/bidList/list";
     }
 }
