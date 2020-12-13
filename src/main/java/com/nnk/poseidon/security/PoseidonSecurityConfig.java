@@ -69,7 +69,10 @@ public class PoseidonSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyRole("ADMIN", "USER")
                 .antMatchers("/", "/api/**", "/css/**").permitAll()
                 .and()
-                .formLogin();
+                .formLogin().loginPage("/login")
+                .defaultSuccessUrl("/bidList/list")
+                .failureUrl("/login").permitAll()
+                .and().logout().logoutUrl("/logout").permitAll();
     }
 
     /**
