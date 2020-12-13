@@ -38,8 +38,19 @@ public class TradeController {
     private static final Logger LOGGER =
             LogManager.getLogger(TradeController.class);
 
+    /**
+     * Static string for the Trade attribute.
+     */
     private static final String TRADE_ATTRIBUTE = "trade";
+
+    /**
+     * Static string for the Trade list attribute.
+     */
     private static final String TRADE_LIST_ATTRIBUTE = "tradeList";
+
+    /**
+     * Static string for the redirection link.
+     */
     private static final String REDIRECTION_LINK = "redirect:/trade/list";
 
     /**
