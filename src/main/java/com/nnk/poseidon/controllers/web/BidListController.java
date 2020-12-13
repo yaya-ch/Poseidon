@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -38,11 +39,22 @@ public class BidListController {
     private static final Logger LOGGER =
             LogManager.getLogger(BidListController.class);
 
+    /**
+     * Static string for the BidList attribute.
+     */
     private static final String BID_LIST_ATTRIBUTE = "bidList";
 
-    private static final String REDIRECTION_TO_BID_LIST_LIST = "redirect:/bidList/list";
+    /**
+     * Static string for the redirection link.
+     */
+    private static final String REDIRECTION_TO_BID_LIST_LIST =
+            "redirect:/bidList/list";
 
+    /**
+     * Static string for the BidList list attribute.
+     */
     private static final String BID_LIST_LIST = "bidListList";
+
     /**
      * BidListService to inject.
      */
@@ -107,7 +119,7 @@ public class BidListController {
     @PostMapping("/validate")
     public String validate(@Valid final BidListDTO bidListDTO,
                            final BindingResult result,
-                           final Model model){
+                           final Model model) {
         LOGGER.debug("POST request sent from the BidLIstController"
                 + " to save a new BidList");
         if (!result.hasFieldErrors()) {
@@ -140,8 +152,17 @@ public class BidListController {
                                  final Model model) {
         LOGGER.debug("GET request sent from the BidListController"
                 + " to display the update form");
-        Optional<BidListDTO> bidListToUpdate = service.findBidListById(id);
-        model.addAttribute(BID_LIST_ATTRIBUTE, bidListToUpdate.get());
+        try {
+            Optional<BidListDTO> bidListToUpdate = service.findBidListById(id);
+            if (bidListToUpdate.isPresent()) {
+                LOGGER.info("BidList {} loaded successfully", id);
+                model.addAttribute(BID_LIST_ATTRIBUTE, bidListToUpdate.get());
+            }
+        } catch (NoSuchElementException e) {
+            LOGGER.error("Failed to load BidList {}."
+                    + " No matching resource found", id);
+            return "404NotFound/404";
+        }
         return "bidList/update";
     }
 
@@ -185,7 +206,13 @@ public class BidListController {
     public String deleteBid(@RequestParam("id") final Integer id) {
         LOGGER.debug("DELETE request sent from the BidListController"
                 + " to delete BidList {}", id);
-        service.deleteById(id);
+        try {
+            service.deleteById(id);
+            LOGGER.info("BidList {} deleted successfully", id);
+        } catch (NoSuchElementException e) {
+            LOGGER.error("Deletion failed. Failed to delete BidList {}", id);
+            return "404NotFound/404";
+        }
         return REDIRECTION_TO_BID_LIST_LIST;
     }
 }

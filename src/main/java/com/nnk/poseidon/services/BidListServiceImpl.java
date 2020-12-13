@@ -30,6 +30,9 @@ public class BidListServiceImpl implements BidListService {
     private static final Logger LOGGER =
             LogManager.getLogger(BidListServiceImpl.class);
 
+    /**
+     * Static string for the error message.
+     */
     private static final String ERROR_MESSAGE = "No matching element found";
 
     /**
