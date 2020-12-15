@@ -207,8 +207,11 @@ public class BidListController {
         LOGGER.debug("DELETE request sent from the BidListController"
                 + " to delete BidList {}", id);
         try {
-            service.deleteById(id);
-            LOGGER.info("BidList {} deleted successfully", id);
+            Optional<BidListDTO> findBidList = service.findBidListById(id);
+            if (findBidList.isPresent()) {
+                service.deleteById(id);
+                LOGGER.info("BidList {} deleted successfully", id);
+            }
         } catch (NoSuchElementException e) {
             LOGGER.error("Deletion failed. Failed to delete BidList {}", id);
             return "404NotFound/404";

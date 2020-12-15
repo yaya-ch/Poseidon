@@ -150,6 +150,7 @@ class UserControllerTest {
     @DisplayName("Delete an exiting User successfully")
     @Test
     void givenCorrectUserId_whenDeleteUser_thenResponseShouldBeRedirectionToUserHomePage() throws Exception {
+        when(service.findById(anyInt())).thenReturn(Optional.of(userDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete?id=1"))
                 .andExpect(redirectedUrl("/user/list"))
                 .andExpect(status().is3xxRedirection());
