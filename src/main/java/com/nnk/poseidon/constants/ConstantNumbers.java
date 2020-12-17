@@ -16,6 +16,11 @@ public final class ConstantNumbers {
     }
 
     /**
+     * constant integer: 8.
+     */
+    public static final int EIGHT = 8;
+
+    /**
      * constant integer: 10.
      */
     public static final int TEN = 10;
