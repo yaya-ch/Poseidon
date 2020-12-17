@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
@@ -120,7 +121,7 @@ public class UserController {
      *                                      username already exists in database
      */
     @PostMapping("/validate")
-    public String validate(@Valid final UserDTO user,
+    public String validate(@Valid @ModelAttribute("user") final UserDTO user,
                            final BindingResult result,
                            final Model model)
             throws ResourceAlreadyExistsException {
@@ -181,7 +182,7 @@ public class UserController {
      */
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") final Integer id,
-                             @Valid final UserDTO user,
+                             @Valid @ModelAttribute("user") final UserDTO user,
                              final BindingResult result,
                              final Model model) {
         LOGGER.debug("POST request sent from the UserController"
