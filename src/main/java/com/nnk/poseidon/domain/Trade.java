@@ -47,7 +47,7 @@ public class Trade {
      */
     @NonNull
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     @Column(name = "account", length = ConstantNumbers.THIRTY)
     private String account;
 
@@ -56,7 +56,7 @@ public class Trade {
      */
     @NonNull
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type is mandatory")
     @Column(name = "type", length = ConstantNumbers.THIRTY)
     private String type;
 
