@@ -227,7 +227,7 @@ public class DataLoader {
         User user = new User();
         user.setId(9);
         user.setUsername("User Name");
-        user.setPassword("user123");
+        user.setPassword("UUUser123&");
         user.setFullName("I m user");
         user.setRole("USER");
         return user;
@@ -241,7 +241,7 @@ public class DataLoader {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(19);
         userDTO.setUsername("UserDTO name");
-        userDTO.setPassword("admin123");
+        userDTO.setPassword("AAAdmin123&");
         userDTO.setFullName("I m userDTO");
         userDTO.setRole("ADMIN");
         return userDTO;

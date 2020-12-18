@@ -1,6 +1,7 @@
 package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
+import com.nnk.poseidon.security.passwordvalidation.ValidPassword;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
@@ -17,7 +18,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * This class groups al user related information.
@@ -55,10 +55,7 @@ public class User {
      * user password.
      */
     @NonNull
-    @Size(min = ConstantNumbers.EIGHT,
-            max = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE,
-            message = "Password must have at least"
-            + " 8 characters and at most 125 characters")
+    @ValidPassword
     @NotBlank(message = "Password is mandatory and must not be black")
     @Column(name = "password",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
