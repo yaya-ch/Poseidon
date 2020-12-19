@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
@@ -117,7 +118,9 @@ public class BidListController {
      * @return the string
      */
     @PostMapping("/validate")
-    public String validate(@Valid final BidListDTO bidListDTO,
+    public String validate(@Valid
+                           @ModelAttribute("bidList")
+                           final BidListDTO bidListDTO,
                            final BindingResult result,
                            final Model model) {
         LOGGER.debug("POST request sent from the BidLIstController"
@@ -177,7 +180,8 @@ public class BidListController {
      */
     @PostMapping("/update/{id}")
     public String updateBid(@PathVariable("id") final Integer id,
-                            @Valid final BidListDTO bidList,
+                            @Valid @ModelAttribute("bidList")
+                            final BidListDTO bidList,
                             final BindingResult result,
                             final Model model) {
         LOGGER.debug("POST request sent to from the BidListController"
@@ -207,8 +211,11 @@ public class BidListController {
         LOGGER.debug("DELETE request sent from the BidListController"
                 + " to delete BidList {}", id);
         try {
-            service.deleteById(id);
-            LOGGER.info("BidList {} deleted successfully", id);
+            Optional<BidListDTO> findBidList = service.findBidListById(id);
+            if (findBidList.isPresent()) {
+                service.deleteById(id);
+                LOGGER.info("BidList {} deleted successfully", id);
+            }
         } catch (NoSuchElementException e) {
             LOGGER.error("Deletion failed. Failed to delete BidList {}", id);
             return "404NotFound/404";

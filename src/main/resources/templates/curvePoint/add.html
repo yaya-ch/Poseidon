@@ -18,27 +18,50 @@
         <form action="#" th:action="@{/curvePoint/validate}"
               th:object="${curvePoint}"
               method="post" class="form-horizontal" style="width: 100%">
-            <!--
-            TODO: Create a form to input the values of CurvePoint, there are 2 buttons: Save data and Cancel to the list CurvePoint
-            -->
-            <input type="text" th:field="*{curveId}"
-                   class="form-control mb-4 col-4" placeholder="Curve Id">
-            <input type="text" th:field="*{asOfDate}" placeholder="As of Date"
-                   class="form-control mb-4 col-4"
-                   value="2020-11-17T00:00"
-                   min="2020-11-17T00:00" max="2099-12-31T23:59">
-            <input type="text" th:field="*{term}"
-                   class="form-control mb-4 col-4" placeholder="Term">
-            <input type="text" th:field="*{value}"
-                   class="form-control mb-4 col-4" placeholder="Value">
-            <button type="submit" class="btn btn-info col-2">Save</button>
 
-            <a class="btn btn-danger col-2" th:href="@{/bidList/list}"
-               role="button"
-               th:onclick="if (!(confirm('Are you sure you want to cancel?'))) return false">
-                Cancel
-            </a>
+            <div class="form-group">
+                <label for="curveId" class="col-sm-2 control-label">Curve Id:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{curveId}"
+                           class="form-control mb-4 col-4" placeholder="Curve Id" id="curveId">
+                </div>
+                <div class="col-sm-10 mt-2">
+                    <p class="text-danger" th:if="${#fields.hasErrors('curveId')}" th:errors="*{curveId}"></p>
+                </div>
+            </div>
 
+            <div class="form-group">
+                <label for="term" class="col-sm-2 control-label">Term:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{term}"
+                           class="form-control mb-4 col-4" placeholder="Term" id="term">
+                </div>
+                <div class="col-sm-10 mt-2">
+                    <p class="text-danger" th:if="${#fields.hasErrors('term')}" th:errors="*{term}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="value" class="col-sm-2 control-label">Value:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{value}"
+                           class="form-control mb-4 col-4" placeholder="Value" id="value">
+                </div>
+                <div class="col-sm-10 mt-2">
+                    <p class="text-danger" th:if="${#fields.hasErrors('value')}" th:errors="*{value}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-info col-2">Save</button>
+                    <a class="btn btn-danger col-2" th:href="@{/curvePoint/list}"
+                       role="button"
+                       th:onclick="if (!(confirm('Are you sure you want to cancel?'))) return false">
+                        Cancel
+                    </a>
+                </div>
+            </div>
         </form>
     </div>
 

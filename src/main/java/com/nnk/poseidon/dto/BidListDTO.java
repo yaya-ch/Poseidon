@@ -28,21 +28,20 @@ public class BidListDTO {
     /**
      * account.
      */
-    @NotNull
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     private String account;
 
     /**
      * type.
      */
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type is mandatory")
     private String type;
 
     /**
      * bid quantity.
      */
-    @NotNull
+    @NotNull(message = "Bid quantity is mandatory and must be a number")
     private Double bidQuantity;
 
     /**

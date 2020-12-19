@@ -43,7 +43,7 @@ public class BidList {
      * account.
      */
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     @Column(name = "account", length = ConstantNumbers.THIRTY)
     private String account;
 
@@ -51,14 +51,14 @@ public class BidList {
      * type.
      */
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type is mandatory")
     @Column(name = "type", length = ConstantNumbers.THIRTY)
     private String type;
 
     /**
      * bid quantity.
      */
-    @NotNull
+    @NotNull(message = "Bid quantity is mandatory and must be a number")
     @Column(name = "bid_quantity")
     private Double bidQuantity;
 

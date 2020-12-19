@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
@@ -115,7 +116,8 @@ public class TradeController {
      * or redirects user to the Trade home page
      */
     @PostMapping("/validate")
-    public String validate(@Valid final TradeDTO trade,
+    public String validate(@Valid
+                           @ModelAttribute("trade") final TradeDTO trade,
                            final BindingResult result,
                            final Model model) {
         LOGGER.debug("POST request sent from the TradeController"
@@ -177,7 +179,8 @@ public class TradeController {
      */
     @PostMapping("/update/{id}")
     public String updateTrade(@PathVariable("id") final Integer id,
-                              @Valid final TradeDTO trade,
+                              @Valid
+                              @ModelAttribute("trade") final TradeDTO trade,
                               final BindingResult result,
                               final Model model) {
         LOGGER.debug("POST request sent from the Trade controller to update"

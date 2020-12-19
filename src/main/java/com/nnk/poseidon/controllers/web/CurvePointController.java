@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
@@ -112,7 +113,9 @@ public class CurvePointController {
      * @return the string
      */
     @PostMapping("/validate")
-    public String validate(@Valid final CurvePointDTO curvePoint,
+    public String validate(@Valid
+                           @ModelAttribute("curvePoint")
+                           final CurvePointDTO curvePoint,
                            final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " CurvePointController to save a new CurvePoint");
@@ -173,7 +176,8 @@ public class CurvePointController {
      */
     @PostMapping("/update/{id}")
     public String updateCurvePoint(@PathVariable("id") final Integer id,
-                                   @Valid final CurvePointDTO curvePoint,
+                                   @Valid @ModelAttribute("curvePoint")
+                                   final CurvePointDTO curvePoint,
                             final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from updateCurvePoint of the"
                 + " CurvePointController to update CurvePoint {}", id);

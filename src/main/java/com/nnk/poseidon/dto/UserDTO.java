@@ -1,5 +1,6 @@
 package com.nnk.poseidon.dto;
 
+import com.nnk.poseidon.security.passwordvalidation.ValidPassword;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,8 @@ public class UserDTO {
     /**
      * user password.
      */
-    @NotBlank(message = "Password is mandatory")
+    @ValidPassword
+    @NotBlank(message = "Password is mandatory and must not be black")
     private String password;
 
     /**

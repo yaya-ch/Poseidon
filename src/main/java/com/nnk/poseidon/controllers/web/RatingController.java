@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -112,7 +113,8 @@ public class RatingController {
      * redirects the user to Rating Home page if Rating has no errors
      */
     @PostMapping("/validate")
-    public String validate(@Valid final RatingDTO ratingDTO,
+    public String validate(@Valid
+                           @ModelAttribute("rating") final RatingDTO ratingDTO,
                            final BindingResult result,
                            final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
@@ -173,7 +175,9 @@ public class RatingController {
      */
     @PostMapping("/update/{id}")
     public String updateRating(@PathVariable("id") final Integer id,
-                               final @Valid RatingDTO rating,
+                               @Valid
+                               @ModelAttribute("rating")
+                               final RatingDTO rating,
                                final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " RatingController to update Rating {}", id);

@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -108,6 +109,14 @@ class BidListControllerTest {
                 .andExpect(status().isOk()).andReturn();
     }
 
+    @DisplayName("GET the update form returns 404 error page")
+    @Test
+    void showUpdateForm_shouldReturn404ErrorPage() throws Exception {
+        when(service.findBidListById(anyInt())).thenThrow(NoSuchElementException.class);
+        mockMvc.perform(MockMvcRequestBuilders.get("/bidList/update?id=6"))
+                .andExpect(MockMvcResultMatchers.view().name("404NotFound/404"));
+    }
+
     @DisplayName("UPDATE valid BidList successfully")
     @Test
     void givenValidBidListDto_whenUpdateBidIsCalled_thenRedirectToHome() throws Exception {
@@ -140,9 +149,19 @@ class BidListControllerTest {
     @DisplayName("DELETE bidListSuccessfully")
     @Test
     void deleteBid_shouldRedirectToBidListList() throws Exception {
+        when(service.findBidListById(anyInt())).thenReturn(Optional.of(bidListDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/delete?id=1"))
                 .andExpect(redirectedUrl("/bidList/list"));
         verify(service, times(1)).deleteById(1);
+    }
+
+    @DisplayName("DELETE bidList returns 404 error page")
+    @Test
+    void deleteBid_shouldReturn404ErrorPage() throws Exception {
+        when(service.findBidListById(anyInt())).thenThrow(NoSuchElementException.class);
+        mockMvc.perform(MockMvcRequestBuilders.get("/bidList/delete?id=1"))
+                .andExpect(view().name("404NotFound/404"));
+        verify(service, never()).deleteById(1);
     }
 }
 

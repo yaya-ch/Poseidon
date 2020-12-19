@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -111,7 +112,9 @@ public class RuleNameController {
      * or redirect the user to the RuleName home page
      */
     @PostMapping("/validate")
-    public String validate(@Valid final RuleNameDTO ruleNameDTO,
+    public String validate(@Valid
+                           @ModelAttribute("ruleName")
+                           final RuleNameDTO ruleNameDTO,
                            final BindingResult result,
                            final Model model) {
         LOGGER.debug("POST request sent from the"
@@ -169,7 +172,9 @@ public class RuleNameController {
      */
     @PostMapping("/update/{id}")
     public String updateRuleName(@PathVariable("id") final Integer id,
-                                 @Valid final RuleNameDTO ruleNameDTO,
+                                 @Valid
+                                 @ModelAttribute("ruleName")
+                                 final RuleNameDTO ruleNameDTO,
                                  final BindingResult result,
                                  final Model model) {
         LOGGER.debug("POST request sent from the"
