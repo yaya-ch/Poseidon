@@ -1,8 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
-import com.nnk.poseidon.converters.RatingConverter;
-import com.nnk.poseidon.domain.Rating;
 import com.nnk.poseidon.dto.RatingDTO;
 import com.nnk.poseidon.services.RatingService;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -66,24 +65,16 @@ public class RatingController {
     private final RestTemplate template;
 
     /**
-     * RatingConverter to inject.
-     */
-    private final RatingConverter converter;
-
-    /**
      * Instantiates a new Rating controller.
      *  @param ratingService   the RatingService
      * @param restTemplate RestTemplate instance that is used for
      *                 consuming the API
-     * @param ratingConverter the RatingConverter
      */
     @Autowired
     public RatingController(final RatingService ratingService,
-                            final RestTemplate restTemplate,
-                            final RatingConverter ratingConverter) {
+                            final RestTemplate restTemplate) {
         this.service = ratingService;
         this.template = restTemplate;
-        this.converter = ratingConverter;
     }
 
     /**
@@ -174,13 +165,19 @@ public class RatingController {
                 + " RatingController to load the update form and update"
                 + " Rating {}", id);
         try {
-            Optional<RatingDTO> ratingToUpdate = service.findRatingById(id);
-            if (ratingToUpdate.isPresent()) {
-                LOGGER.info("Rating {} loaded successfully",
-                        ratingToUpdate.get().getId());
-                model.addAttribute(RATING_ATTRIBUTE, ratingToUpdate.get());
+            String findRatingById = ApiUrlConstants.RATING_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<RatingDTO> responseEntity = template.exchange(
+                    findRatingById,
+                    HttpMethod.GET,
+                    null,
+                    RatingDTO.class
+            );
+            if (responseEntity.hasBody()) {
+                LOGGER.info("Rating {} loaded successfully", id);
+                model.addAttribute(RATING_ATTRIBUTE, responseEntity.getBody());
             }
-        } catch (NoSuchElementException e) {
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load Rating {}. No matching item present",
                     id);
             return "404NotFound/404";
@@ -206,12 +203,17 @@ public class RatingController {
                                final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " RatingController to update Rating {}", id);
+        String updateRatingUrl = ApiUrlConstants.RATING_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
-            Rating ratingToSave = converter
-                    .ratingDTOToRatingEntityConverter(rating);
-            service.updateRating(id, ratingToSave);
+            HttpEntity<RatingDTO> httpEntity = new HttpEntity<>(rating);
+            template.exchange(
+                    updateRatingUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("Rating {} updated successfully", id);
-            model.addAttribute("ratingList", service.findAllRatings());
             return REDIRECTION_LINK;
         }
         LOGGER.error("Failed to validate Rating {}. UpdateForm reloaded", id);
