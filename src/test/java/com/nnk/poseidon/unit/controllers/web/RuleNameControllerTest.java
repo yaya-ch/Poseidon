@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -127,10 +128,16 @@ class RuleNameControllerTest {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @Disabled("This test will be refactored")
     @DisplayName("GET: Loading the RuleName update form load error page when id is incorrect")
     @Test
     void givenInvalidRuleNameId_whenUpdateRuleName_then404ErrorPageShouldBeLoaded() throws Exception {
+        String findRuleNameByIdUrl = "http://localhost:8080/api/ruleName/findById/1";
+        when(template.exchange(
+                findRuleNameByIdUrl,
+                HttpMethod.GET,
+                null,
+                RuleNameDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/ruleName/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();
@@ -176,10 +183,16 @@ class RuleNameControllerTest {
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
 
-    @Disabled("This test will be refactored")
     @DisplayName("DELETE: invalid RuleName id returns 404 error page")
     @Test
     void givenInvalidRuleNameId_whenDeleteRuleName_then404ErrorPageShouldBeReturned() throws Exception {
+        String deleteRuleNameUrl = "http://localhost:8080/api/ruleName/delete/1";
+        when(template.exchange(
+                deleteRuleNameUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/ruleName/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();

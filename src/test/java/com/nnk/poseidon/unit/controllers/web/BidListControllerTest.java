@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -117,7 +118,6 @@ class BidListControllerTest {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @Disabled("This test fails always..it will be refactored soon")
     @DisplayName("GET the update form returns 404 error page")
     @Test
     void showUpdateForm_shouldReturn404ErrorPage() throws Exception {
@@ -127,7 +127,7 @@ class BidListControllerTest {
                 HttpMethod.GET,
                 null,
                 BidListDTO.class
-        )).thenReturn(new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/update?id=6"))
                 .andExpect(MockMvcResultMatchers.view().name("404NotFound/404"));
     }
@@ -167,7 +167,6 @@ class BidListControllerTest {
                 .andExpect(status().is3xxRedirection());
     }
 
-    @Disabled("This test fails always..it will be refactored soon")
     @DisplayName("DELETE bidList returns 404 error page")
     @Test
     void deleteBid_shouldReturn404ErrorPage() throws Exception {
@@ -176,9 +175,8 @@ class BidListControllerTest {
                 deleteBidUrl,
                 HttpMethod.DELETE,
                 null,
-                String.class)).thenReturn(null);
+                String.class)).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/bidList/delete?id=1"))
-                .andExpect(view().name("404NotFound/404"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(view().name("404NotFound/404"));
     }
 }
