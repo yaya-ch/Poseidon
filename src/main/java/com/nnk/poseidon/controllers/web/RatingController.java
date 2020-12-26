@@ -1,5 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.converters.RatingConverter;
 import com.nnk.poseidon.domain.Rating;
 import com.nnk.poseidon.dto.RatingDTO;
@@ -7,6 +8,9 @@ import com.nnk.poseidon.services.RatingService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,20 +60,28 @@ public class RatingController {
     private final RatingService service;
 
     /**
+     * RestTemplate to inject.
+     */
+    private final RestTemplate template;
+
+    /**
      * RatingConverter to inject.
      */
     private final RatingConverter converter;
 
     /**
      * Instantiates a new Rating controller.
-     *
-     * @param ratingService   the RatingService
+     *  @param ratingService   the RatingService
+     * @param restTemplate RestTemplate instance that is used for
+     *                 consuming the API
      * @param ratingConverter the RatingConverter
      */
     @Autowired
     public RatingController(final RatingService ratingService,
+                            final RestTemplate restTemplate,
                             final RatingConverter ratingConverter) {
         this.service = ratingService;
+        this.template = restTemplate;
         this.converter = ratingConverter;
     }
 
@@ -83,8 +96,15 @@ public class RatingController {
         LOGGER.debug("GET request sent from the home method of the"
                 + " RatingController to load the html home page and display"
                 + " all the ratings");
-        List<RatingDTO> ratingList = service.findAllRatings();
-        model.addAttribute("ratingList", ratingList);
+        String findAllRatingsUrl = ApiUrlConstants.RATING_API_BASE_URL
+                + "/findAll";
+        ResponseEntity<List<RatingDTO>> responseEntity = template.exchange(
+                findAllRatingsUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<RatingDTO>>() { }
+        );
+        model.addAttribute("ratingList", responseEntity.getBody());
         return "rating/list";
     }
 

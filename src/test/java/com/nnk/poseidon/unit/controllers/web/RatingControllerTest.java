@@ -10,13 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -42,6 +49,9 @@ class RatingControllerTest {
     private RatingService service;
 
     @MockBean
+    private RestTemplate template;
+
+    @MockBean
     private RatingConverter converter;
 
     private Rating rating;
@@ -58,11 +68,19 @@ class RatingControllerTest {
     @DisplayName("Load the Rating home page")
     @Test
     void home_shouldReturnRatingHomePage_andAllRatings() throws Exception {
+        List<RatingDTO> ratingDTOList = new ArrayList<>();
+        ratingDTOList.add(ratingDTO);
+        String findAllRatingsUrl = "http://localhost:8080/api/rating/findAll";
+        when(template.exchange(
+                findAllRatingsUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<RatingDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(ratingDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("ratingList"))
                 .andExpect(view().name("rating/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllRatings();
     }
 
     @DisplayName("Load the addForm html page")
