@@ -2,7 +2,6 @@ package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.CurvePointDTO;
-import com.nnk.poseidon.services.CurvePointService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type Curve controller.
@@ -57,25 +54,17 @@ public class CurvePointController {
             "redirect:/curvePoint/list";
 
     /**
-     * CurvePointService to inject.
-     */
-    private final CurvePointService service;
-
-    /**
      * RestTemplate to inject.
      */
     private final RestTemplate template;
 
     /**
      * Instantiates a new CurvePointController.
-     *  @param curvePointService   the CurvePointService
      * @param restTemplate RestTemplate instance that is used for
      *                     consuming the API
      */
     @Autowired
-    public CurvePointController(final CurvePointService curvePointService,
-                                final RestTemplate restTemplate) {
-        this.service = curvePointService;
+    public CurvePointController(final RestTemplate restTemplate) {
         this.template = restTemplate;
     }
 
@@ -235,14 +224,17 @@ public class CurvePointController {
         LOGGER.debug("GET request sent from the deleteCurve of the"
                 + " CurvePointController to delete CurvePoint {}", id);
         try {
-            Optional<CurvePointDTO> findCurvePointById =
-                    service.findCurvePointById(id);
-            if (findCurvePointById.isPresent()) {
-                LOGGER.info(" CurvePoint {} deleted successfully."
-                        + " Redirecting to the CurvePoint list", id);
-                service.deleteCurvePointById(id);
-            }
-        } catch (NoSuchElementException e) {
+            String deleteCurvePoint = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                    + "/delete/" + id;
+            template.exchange(
+                    deleteCurvePoint,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info(" CurvePoint {} deleted successfully."
+                    + " Redirecting to the CurvePoint list", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("There is no matching CurvePoint that has id {}", id);
             return "404NotFound/404";
         }
