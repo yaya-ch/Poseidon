@@ -2,7 +2,6 @@ package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.TradeDTO;
-import com.nnk.poseidon.services.TradeService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type RuleName controller.
@@ -61,25 +58,17 @@ public class TradeController {
     private static final String REDIRECTION_LINK = "redirect:/trade/list";
 
     /**
-     * TradeService to inject.
-     */
-    private final TradeService service;
-
-    /**
      * RestTemplate to inject.
      */
     private final RestTemplate template;
 
     /**
      * Instantiates a new Trade controller.
-     *  @param tradeService   the trade service
      * @param restTemplate RestTemplate instance that is used for
      *                     consuming the API
      */
     @Autowired
-    public TradeController(final TradeService tradeService,
-                           final RestTemplate restTemplate) {
-        this.service = tradeService;
+    public TradeController(final RestTemplate restTemplate) {
         this.template = restTemplate;
     }
 
@@ -239,13 +228,17 @@ public class TradeController {
     public String deleteTrade(@RequestParam final Integer id) {
         LOGGER.debug("GET request sent from the"
                 + " TradeController to delete Trade {}", id);
+        String deleteTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL
+                + "/delete/" + id;
         try {
-            Optional<TradeDTO> check = service.findTradeById(id);
-            if (check.isPresent()) {
-                service.deleteTrade(id);
-                LOGGER.info("Trade {} deleted successfully", id);
-            }
-        } catch (NoSuchElementException e) {
+            template.exchange(
+                    deleteTradeUrl,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("Trade {} deleted successfully", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Deletion failed. No matching Trade resource"
                     + " for id: {}", id);
             return "404NotFound/404";

@@ -2,7 +2,6 @@ package com.nnk.poseidon.unit.controllers.web;
 
 import com.nnk.poseidon.domain.Trade;
 import com.nnk.poseidon.dto.TradeDTO;
-import com.nnk.poseidon.services.TradeService;
 import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,9 +40,6 @@ class TradeControllerTest {
     private WebApplicationContext context;
 
     private MockMvc mockMvc;
-
-    @MockBean
-    private TradeService service;
 
     @MockBean
     private RestTemplate template;
@@ -166,20 +160,23 @@ class TradeControllerTest {
     @DisplayName("Delete Trade successfully")
     @Test
     void givenCorrectTradeId_whenDeleteTrade_thenResponseShouldBeRedirectionToTradeHomePage() throws Exception {
-        when(service.findTradeById(anyInt())).thenReturn(Optional.of(tradeDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/trade/delete?id=1"))
                 .andExpect(redirectedUrl("/trade/list"))
                 .andExpect(status().is3xxRedirection());
-        verify(service, times(1)).deleteTrade(1);
     }
 
     @DisplayName("Delete Trade successfully")
     @Test
     void givenIncorrectTradeId_whenDeleteTrade_thenErrorPageShouldBeLoaded() throws Exception {
-        when(service.findTradeById(anyInt())).thenThrow(NoSuchElementException.class);
+        String deleteTradeUrl = "http://localhost:8080/api/trade/delete/1";
+        when(template.exchange(
+                deleteTradeUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/trade/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andExpect(status().isOk());
-        verify(service, never()).deleteTrade(1);
     }
 }
