@@ -1,8 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
-import com.nnk.poseidon.converters.CurvePointConverter;
-import com.nnk.poseidon.domain.CurvePoint;
 import com.nnk.poseidon.dto.CurvePointDTO;
 import com.nnk.poseidon.services.CurvePointService;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -68,24 +67,16 @@ public class CurvePointController {
     private final RestTemplate template;
 
     /**
-     * CurvePointConverter to inject.
-     */
-    private final CurvePointConverter converter;
-
-    /**
      * Instantiates a new CurvePointController.
      *  @param curvePointService   the CurvePointService
      * @param restTemplate RestTemplate instance that is used for
-     *      *                     consuming the API
-     * @param curvePointConverter the CurvePointConverter
+     *                     consuming the API
      */
     @Autowired
     public CurvePointController(final CurvePointService curvePointService,
-                                final RestTemplate restTemplate,
-                                final CurvePointConverter curvePointConverter) {
+                                final RestTemplate restTemplate) {
         this.service = curvePointService;
         this.template = restTemplate;
-        this.converter = curvePointConverter;
     }
 
     /**
@@ -140,7 +131,8 @@ public class CurvePointController {
                            final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " CurvePointController to save a new CurvePoint");
-        String addCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL + "/add";
+        String addCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/add";
         if (!result.hasErrors()) {
             curvePoint.setCreationDate(
                     new Timestamp(System.currentTimeMillis()));
@@ -174,15 +166,21 @@ public class CurvePointController {
         LOGGER.debug("GET request sent from the showUpdateForm of the "
                 + " CurvePointController to update CurvePoint {}", id);
         try {
-            Optional<CurvePointDTO> curvePointToUpdate =
-                    service.findCurvePointById(id);
-            if (curvePointToUpdate.isPresent()) {
+            String findCurveByIdUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<CurvePointDTO> responseEntity = template.exchange(
+                    findCurveByIdUrl,
+                    HttpMethod.GET,
+                    null,
+                    CurvePointDTO.class
+            );
+            if (responseEntity.hasBody()) {
                 LOGGER.debug("CurvePoint {} loaded successfully"
                         + " in the updateForm", id);
                 model.addAttribute(CURVE_POINT_ATTRIBUTE,
-                        curvePointToUpdate.get());
+                        responseEntity.getBody());
             }
-        } catch (NoSuchElementException e) {
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load CurvePoint {}", id);
             return "404NotFound/404";
         }
@@ -206,13 +204,18 @@ public class CurvePointController {
                             final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from updateCurvePoint of the"
                 + " CurvePointController to update CurvePoint {}", id);
+        String updateCurvePoint = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
-            CurvePoint curvePointToSave =
-                    converter.curvePointDTOToCurvePointEntity(curvePoint);
-            service.updateCurvePoint(id, curvePointToSave);
+            HttpEntity<CurvePointDTO> httpEntity = new HttpEntity<>(curvePoint);
+            template.exchange(
+                    updateCurvePoint,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("CurvePoint {} updated successfully."
                     + " Redirecting to CurvePoint list", id);
-            model.addAttribute("curvePointList", service.findAllCurvePoints());
             return REDIRECTION_URL;
         }
         LOGGER.error("CurvePoint {} update Failed."
