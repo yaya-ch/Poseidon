@@ -1,6 +1,5 @@
 package com.nnk.poseidon.unit.controllers.web;
 
-import com.nnk.poseidon.converters.UserConverter;
 import com.nnk.poseidon.domain.User;
 import com.nnk.poseidon.dto.UserDTO;
 import com.nnk.poseidon.services.UserService;
@@ -47,9 +46,6 @@ class UserControllerTest {
 
     @MockBean
     private UserService service;
-
-    @MockBean
-    private UserConverter converter;
 
     @MockBean
     private RestTemplate template;

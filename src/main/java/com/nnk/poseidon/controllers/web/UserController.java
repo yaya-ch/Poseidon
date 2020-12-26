@@ -1,8 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
-import com.nnk.poseidon.converters.UserConverter;
-import com.nnk.poseidon.domain.User;
 import com.nnk.poseidon.dto.UserDTO;
 import com.nnk.poseidon.exceptions.ResourceAlreadyExistsException;
 import com.nnk.poseidon.services.UserService;
@@ -69,11 +67,6 @@ public class UserController {
     private final RestTemplate template;
 
     /**
-     * UserConverter to inject.
-     */
-    private final UserConverter converter;
-
-    /**
      * PasswordEncoder to inject.
      */
     private final PasswordEncoder encoder;
@@ -83,16 +76,13 @@ public class UserController {
      *  @param userService     the UserService
      * @param restTemplate RestTemplate instance that is used for
      *                 consuming the API
-     * @param userConverter   the UserConverter
      * @param passwordEncoder the PasswordEncoder
      */
     public UserController(final UserService userService,
                           final RestTemplate restTemplate,
-                          final UserConverter userConverter,
                           final PasswordEncoder passwordEncoder) {
         this.service = userService;
         this.template = restTemplate;
-        this.converter = userConverter;
         this.encoder = passwordEncoder;
     }
 
@@ -220,10 +210,17 @@ public class UserController {
                              final Model model) {
         LOGGER.debug("POST request sent from the UserController"
                 + " to update User {}", id);
+        String updateUserUrl = ApiUrlConstants.USER_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
             user.setPassword(encoder.encode(user.getPassword()));
-            User userToUpdate = converter.userDTOToUserEntityConverter(user);
-            service.updateUser(id, userToUpdate);
+            HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
+            template.exchange(
+                    updateUserUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("User {} updated successfully", id);
             model.addAttribute(USER_LIST, service.findAllUsers());
             return REDIRECTION_LINK;
