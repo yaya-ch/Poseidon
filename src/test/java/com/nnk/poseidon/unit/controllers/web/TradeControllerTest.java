@@ -1,6 +1,5 @@
 package com.nnk.poseidon.unit.controllers.web;
 
-import com.nnk.poseidon.converters.TradeConverter;
 import com.nnk.poseidon.domain.Trade;
 import com.nnk.poseidon.dto.TradeDTO;
 import com.nnk.poseidon.services.TradeService;
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -49,9 +49,6 @@ class TradeControllerTest {
 
     @MockBean
     private RestTemplate template;
-
-    @MockBean
-    private TradeConverter converter;
 
     private Trade trade;
     private TradeDTO tradeDTO;
@@ -116,7 +113,13 @@ class TradeControllerTest {
     @DisplayName("Load the update form")
     @Test
     void showUpdateForm_shouldLoadTheTradeUpdateForm() throws Exception {
-        when(service.findTradeById(anyInt())).thenReturn(Optional.of(tradeDTO));
+        String findByIdUrl = "http://localhost:8080/api/trade/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                TradeDTO.class
+        )).thenReturn(new ResponseEntity<>(tradeDTO, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/trade/update?id=1"))
                 .andExpect(model().attributeExists("trade"))
                 .andExpect(view().name("trade/update"))
@@ -126,7 +129,13 @@ class TradeControllerTest {
     @DisplayName("Load 404 error page instead of update form when Trade id is incorrect")
     @Test
     void showUpdateForm_shouldLoad404ErrorPage() throws Exception {
-        when(service.findTradeById(anyInt())).thenThrow(NoSuchElementException.class);
+        String findByIdUrl = "http://localhost:8080/api/trade/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                TradeDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/trade/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andExpect(status().isOk()).andReturn();

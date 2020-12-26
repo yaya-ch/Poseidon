@@ -1,8 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
-import com.nnk.poseidon.converters.TradeConverter;
-import com.nnk.poseidon.domain.Trade;
 import com.nnk.poseidon.dto.TradeDTO;
 import com.nnk.poseidon.services.TradeService;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -72,24 +71,16 @@ public class TradeController {
     private final RestTemplate template;
 
     /**
-     * TradeConverter to inject.
-     */
-    private final TradeConverter converter;
-
-    /**
      * Instantiates a new Trade controller.
      *  @param tradeService   the trade service
      * @param restTemplate RestTemplate instance that is used for
      *                     consuming the API
-     * @param tradeConverter the trade converter
      */
     @Autowired
     public TradeController(final TradeService tradeService,
-                           final RestTemplate restTemplate,
-                           final TradeConverter tradeConverter) {
+                           final RestTemplate restTemplate) {
         this.service = tradeService;
         this.template = restTemplate;
-        this.converter = tradeConverter;
     }
 
     /**
@@ -180,12 +171,19 @@ public class TradeController {
         LOGGER.debug("GET request sent from the TradeController to update"
                 + " Trade {}", id);
         try {
-            Optional<TradeDTO> trade = service.findTradeById(id);
-            if (trade.isPresent()) {
+            String findTradeById = ApiUrlConstants.TRADE_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<TradeDTO> responseEntity = template.exchange(
+                    findTradeById,
+                    HttpMethod.GET,
+                    null,
+                    TradeDTO.class
+            );
+            if (responseEntity.hasBody()) {
                 LOGGER.info("Update form loaded successfully");
-                model.addAttribute(TRADE_ATTRIBUTE, trade.get());
+                model.addAttribute(TRADE_ATTRIBUTE, responseEntity.getBody());
             }
-        } catch (NoSuchElementException e) {
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load Trade {}."
                     + " No matching resource is present", id);
             return "404NotFound/404";
@@ -211,13 +209,18 @@ public class TradeController {
                               final Model model) {
         LOGGER.debug("POST request sent from the Trade controller to update"
                 + " Trade {}", id);
+        String updateTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
             trade.setRevisionDate(new Timestamp(System.currentTimeMillis()));
-            Trade tradeToUpdate =
-                    converter.tradeDTOToTradeEntityConverter(trade);
-            service.updateTrade(id, tradeToUpdate);
+            HttpEntity<TradeDTO> httpEntity = new HttpEntity<>(trade);
+            template.exchange(
+                    updateTradeUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("Trade {} update successfully", id);
-            model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
             return REDIRECTION_LINK;
         }
         model.addAttribute(TRADE_ATTRIBUTE, trade);
