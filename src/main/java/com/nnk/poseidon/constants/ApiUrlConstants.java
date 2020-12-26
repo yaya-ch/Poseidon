@@ -38,4 +38,10 @@ public final class ApiUrlConstants {
      */
     public static final String RULE_NAME_API_BASE_URL =
             "http://localhost:8080/api/ruleName";
+
+    /**
+     * A constant String that refers to the RuleName api base url.
+     */
+    public static final String TRADE_API_BASE_URL =
+            "http://localhost:8080/api/trade";
 }
