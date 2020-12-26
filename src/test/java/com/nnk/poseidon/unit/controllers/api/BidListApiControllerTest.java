@@ -107,7 +107,7 @@ class BidListApiControllerTest {
     @DisplayName("Find BidList by id")
     @Test
     void givenCorrectBidListId_whenFindByIdIsCalled_thenBidListShouldBeReturned() throws Exception {
-        Optional<BidListDTO> bidListDTO = Optional.ofNullable(converter.bidListEntityToBidListDTO(bidList));
+        BidListDTO bidListDTO = converter.bidListEntityToBidListDTO(bidList);
         when(service.findBidListById(anyInt())).thenReturn(bidListDTO);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/bidList/findById/1")
                 .content(new ObjectMapper().writeValueAsString(bidList))

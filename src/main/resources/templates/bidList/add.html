@@ -90,13 +90,17 @@
             <input type="hidden" th:field="*{side}"
                    class="form-control mb-4 col-4" placeholder="Side">
 
-            <button type="submit" class="btn btn-info col-2">Save</button>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-info col-2">Save</button>
 
-            <a class="btn btn-danger col-2" th:href="@{/bidList/list}"
-               role="button"
-               th:onclick="if (!(confirm('Are you sure you want to cancel?'))) return false">
-                Cancel
-            </a>
+                    <a class="btn btn-danger col-2" th:href="@{/bidList/list}"
+                       role="button"
+                       th:onclick="if (!(confirm('Are you sure you want to cancel?'))) return false">
+                        Cancel
+                    </a>
+                </div>
+            </div>
 
             <br/><br/><br/><br/>
 

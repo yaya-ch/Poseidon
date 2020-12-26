@@ -111,7 +111,7 @@ public class BidListServiceImpl implements BidListService {
      * @return the BidList
      */
     @Override
-    public Optional<BidListDTO> findBidListById(final Integer id) {
+    public BidListDTO findBidListById(final Integer id) {
         Optional<BidList> checkForExistingBidList = repository.findById(id);
         if (!checkForExistingBidList.isPresent()) {
             LOGGER.error("Failed to load BidList {}."
@@ -120,8 +120,8 @@ public class BidListServiceImpl implements BidListService {
                     + ERROR_MESSAGE);
         } else {
             LOGGER.info("BidList {} loaded successfully.", id);
-            return Optional.ofNullable(converter
-                    .bidListEntityToBidListDTO(checkForExistingBidList.get()));
+            return converter
+                    .bidListEntityToBidListDTO(checkForExistingBidList.get());
         }
     }
 
