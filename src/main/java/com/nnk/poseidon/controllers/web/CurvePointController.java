@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -139,15 +140,19 @@ public class CurvePointController {
                            final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " CurvePointController to save a new CurvePoint");
+        String addCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
             curvePoint.setCreationDate(
                     new Timestamp(System.currentTimeMillis()));
-            CurvePoint curvePointToSave =
-                    converter.curvePointDTOToCurvePointEntity(curvePoint);
-            service.saveCurvePoint(curvePointToSave);
-            model.addAttribute(CURVE_POINT_ATTRIBUTE, curvePointToSave);
+            HttpEntity<CurvePointDTO> httpEntity = new HttpEntity<>(curvePoint);
+            template.exchange(
+                    addCurvePointUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("CurvePoint {} saved successfully",
-                    curvePointToSave.getCurvePointId());
+                    curvePoint.getCurveId());
             return REDIRECTION_URL;
         }
         LOGGER.error("Failed to save the CurvePoint."

@@ -97,8 +97,6 @@ class CurvePointControllerTest {
     @DisplayName("POST: Save new CurvePoint successfully")
     @Test
     void givenValidCurvePoint_whenSavingNewCurvePoint_thenResponseShouldBeOk_andCurvePageShouldBeLoaded() throws Exception {
-        when(converter.curvePointDTOToCurvePointEntity(any(CurvePointDTO.class))).thenReturn(curvePoint);
-        curvePointDTO.setCurvePointId(1);
         mockMvc.perform(MockMvcRequestBuilders.post("/curvePoint/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("curveId", curvePoint.getCurveId().toString())
@@ -112,7 +110,6 @@ class CurvePointControllerTest {
     @DisplayName("POST: invalid CurvePoint information return the add form")
     @Test
     void givenInvalidCurvePoint_whenSavingNewCurvePoint_thenAddFormShouldBeReloaded() throws Exception {
-        when(converter.curvePointDTOToCurvePointEntity(any(CurvePointDTO.class))).thenReturn(curvePoint);
         mockMvc.perform(MockMvcRequestBuilders.post("/curvePoint/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("curveId", curvePoint.getCurveId().toString())
