@@ -9,6 +9,7 @@ import com.nnk.poseidon.services.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -148,12 +149,17 @@ public class UserController {
             throws ResourceAlreadyExistsException {
         LOGGER.debug("POST request sent from the UserController"
                 + " to save new User");
+        String addUserUrl = ApiUrlConstants.USER_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
             user.setPassword(encoder.encode(user.getPassword()));
-            User userToSave = converter.userDTOToUserEntityConverter(user);
-            service.saveNewUser(userToSave);
+            HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
+            template.exchange(
+                    addUserUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("User saved successfully by the UserController");
-            model.addAttribute(USER_LIST, service.findAllUsers());
             return REDIRECTION_LINK;
         } else {
             LOGGER.error("Failed to save the User because of invalid input."
