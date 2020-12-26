@@ -2,7 +2,6 @@ package com.nnk.poseidon.unit.controllers.web;
 
 import com.nnk.poseidon.domain.User;
 import com.nnk.poseidon.dto.UserDTO;
-import com.nnk.poseidon.services.UserService;
 import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,9 +40,6 @@ class UserControllerTest {
     private WebApplicationContext context;
 
     private MockMvc mockMvc;
-
-    @MockBean
-    private UserService service;
 
     @MockBean
     private RestTemplate template;
@@ -175,7 +169,6 @@ class UserControllerTest {
     @DisplayName("Delete an exiting User successfully")
     @Test
     void givenCorrectUserId_whenDeleteUser_thenResponseShouldBeRedirectionToUserHomePage() throws Exception {
-        when(service.findById(anyInt())).thenReturn(Optional.of(userDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete?id=1"))
                 .andExpect(redirectedUrl("/user/list"))
                 .andExpect(status().is3xxRedirection());
@@ -184,7 +177,13 @@ class UserControllerTest {
     @DisplayName("Load 404 error page when User id is incorrect")
     @Test
     void givenIncorrectUserId_whenDeleteUser_then404ErrorPageShouldBeReturned() throws Exception {
-        when(service.findById(anyInt())).thenThrow(NoSuchElementException.class);
+        String deleteUserUrl = "http://localhost:8080/api/user/delete/1";
+        when(template.exchange(
+                deleteUserUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"));
     }
