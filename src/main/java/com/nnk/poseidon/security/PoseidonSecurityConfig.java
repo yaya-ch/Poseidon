@@ -63,7 +63,7 @@ public class PoseidonSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/admin/**", "/app/**",
-                        "/user/**", "/**/delete/**").hasRole("ADMIN")
+                        "/user/**").hasRole("ADMIN")
                 .antMatchers("/bidList/**", "/curvePoint/**",
                         "/rating/**", "/ruleName/**", "/trade/**")
                 .hasAnyRole("ADMIN", "USER")
