@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -140,12 +141,16 @@ public class RatingController {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " RatingController to add a new Rating {}",
                 ratingDTO.getId());
+        String addRatingUrl = ApiUrlConstants.RATING_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
-            Rating rating = converter
-                    .ratingDTOToRatingEntityConverter(ratingDTO);
-            service.saveRating(rating);
+            HttpEntity<RatingDTO> httpEntity = new HttpEntity<>(ratingDTO);
+            template.exchange(
+                    addRatingUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("Rating {} saved successfully", ratingDTO.getId());
-            model.addAttribute(RATING_ATTRIBUTE, rating);
             return REDIRECTION_LINK;
         }
         LOGGER.error("Failed to save Rating {}. Loading the addForm again.",

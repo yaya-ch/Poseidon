@@ -95,8 +95,6 @@ class RatingControllerTest {
     @DisplayName("POST: save a valid Rating successfully")
     @Test
     void givenValidRating_whenSavingNewRating_thenResponseShouldBeOk_andRatingHomeShouldBeLoaded() throws Exception {
-        when(converter.ratingDTOToRatingEntityConverter(any(RatingDTO.class))).thenReturn(rating);
-        ratingDTO.setId(1);
         mockMvc.perform(MockMvcRequestBuilders.post("/rating/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("moodysRating", rating.getMoodysRating())
@@ -111,8 +109,6 @@ class RatingControllerTest {
     @DisplayName("POST: saving invalid fails and loads the addForm")
     @Test
     void givenInvalidRating_whenSavingNewRating_thenAddRatingFormShouldBeReloaded() throws Exception {
-        when(converter.ratingDTOToRatingEntityConverter(any(RatingDTO.class))).thenReturn(rating);
-        ratingDTO.setId(1);
         mockMvc.perform(MockMvcRequestBuilders.post("/rating/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("moodysRating", "")
