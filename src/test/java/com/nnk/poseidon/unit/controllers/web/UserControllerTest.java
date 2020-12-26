@@ -1,23 +1,27 @@
 package com.nnk.poseidon.unit.controllers.web;
 
-import com.nnk.poseidon.converters.UserConverter;
 import com.nnk.poseidon.domain.User;
 import com.nnk.poseidon.dto.UserDTO;
-import com.nnk.poseidon.services.UserService;
 import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,12 +42,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService service;
-
-    @MockBean
-    private UserConverter converter;
-
-
+    private RestTemplate template;
 
     private User user;
     private UserDTO userDTO;
@@ -59,11 +58,19 @@ class UserControllerTest {
     @DisplayName("Load the Users' home page")
     @Test
     void home_shouldReturnTheUserHomePage_andAllUsers() throws Exception {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        userDTOList.add(userDTO);
+        String findAllUserUrl = "http://localhost:8080/api/user/findAll";
+        when(template.exchange(
+                findAllUserUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<UserDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(userDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("users"))
                 .andExpect(view().name("user/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllUsers();
     }
 
     @DisplayName("Load the User addForm")
@@ -105,7 +112,13 @@ class UserControllerTest {
     @DisplayName("Load the updateForm successfully")
     @Test
     void givenCorrectUserId_whenShowUpdateForm_thenUpdateFormShouldBeReturned() throws Exception {
-        when(service.findById(anyInt())).thenReturn(Optional.of(userDTO));
+        String findByIdUrl = "http://localhost:8080/api/user/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                UserDTO.class
+        )).thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/update?id=1"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(view().name("user/update"))
@@ -115,7 +128,13 @@ class UserControllerTest {
     @DisplayName("Load 404 error page instead of updateForm when User id is incorrect")
     @Test
     void givenIncorrectUserId_whenShowUpdateForm_then404ErrorPageShouldBeLoaded() throws Exception {
-        when(service.findById(anyInt())).thenThrow(NoSuchElementException.class);
+        String findByIdUrl = "http://localhost:8080/api/user/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                UserDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andExpect(status().isOk()).andReturn();
@@ -150,7 +169,6 @@ class UserControllerTest {
     @DisplayName("Delete an exiting User successfully")
     @Test
     void givenCorrectUserId_whenDeleteUser_thenResponseShouldBeRedirectionToUserHomePage() throws Exception {
-        when(service.findById(anyInt())).thenReturn(Optional.of(userDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete?id=1"))
                 .andExpect(redirectedUrl("/user/list"))
                 .andExpect(status().is3xxRedirection());
@@ -159,7 +177,13 @@ class UserControllerTest {
     @DisplayName("Load 404 error page when User id is incorrect")
     @Test
     void givenIncorrectUserId_whenDeleteUser_then404ErrorPageShouldBeReturned() throws Exception {
-        when(service.findById(anyInt())).thenThrow(NoSuchElementException.class);
+        String deleteUserUrl = "http://localhost:8080/api/user/delete/1";
+        when(template.exchange(
+                deleteUserUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"));
     }
