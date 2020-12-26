@@ -1,5 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.converters.TradeConverter;
 import com.nnk.poseidon.domain.Trade;
 import com.nnk.poseidon.dto.TradeDTO;
@@ -7,6 +8,9 @@ import com.nnk.poseidon.services.TradeService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,9 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -60,20 +66,28 @@ public class TradeController {
     private final TradeService service;
 
     /**
+     * RestTemplate to inject.
+     */
+    private final RestTemplate template;
+
+    /**
      * TradeConverter to inject.
      */
     private final TradeConverter converter;
 
     /**
      * Instantiates a new Trade controller.
-     *
-     * @param tradeService   the trade service
+     *  @param tradeService   the trade service
+     * @param restTemplate RestTemplate instance that is used for
+     *                     consuming the API
      * @param tradeConverter the trade converter
      */
     @Autowired
     public TradeController(final TradeService tradeService,
+                           final RestTemplate restTemplate,
                            final TradeConverter tradeConverter) {
         this.service = tradeService;
+        this.template = restTemplate;
         this.converter = tradeConverter;
     }
 
@@ -87,7 +101,14 @@ public class TradeController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the TradeController to load the"
                 + " Trade home page");
-        model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
+        String findAllUrl = ApiUrlConstants.TRADE_API_BASE_URL + "/findAll";
+        ResponseEntity<List<TradeDTO>> responseEntity = template.exchange(
+                findAllUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<TradeDTO>>() { }
+        );
+        model.addAttribute(TRADE_LIST_ATTRIBUTE, responseEntity.getBody());
         return "trade/list";
     }
 
