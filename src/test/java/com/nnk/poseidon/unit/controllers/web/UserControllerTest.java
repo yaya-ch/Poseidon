@@ -10,12 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -43,7 +50,8 @@ class UserControllerTest {
     @MockBean
     private UserConverter converter;
 
-
+    @MockBean
+    private RestTemplate template;
 
     private User user;
     private UserDTO userDTO;
@@ -59,11 +67,19 @@ class UserControllerTest {
     @DisplayName("Load the Users' home page")
     @Test
     void home_shouldReturnTheUserHomePage_andAllUsers() throws Exception {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        userDTOList.add(userDTO);
+        String findAllUserUrl = "http://localhost:8080/api/user/findAll";
+        when(template.exchange(
+                findAllUserUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<UserDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(userDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("users"))
                 .andExpect(view().name("user/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllUsers();
     }
 
     @DisplayName("Load the User addForm")

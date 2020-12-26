@@ -1,5 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.converters.UserConverter;
 import com.nnk.poseidon.domain.User;
 import com.nnk.poseidon.dto.UserDTO;
@@ -7,6 +8,9 @@ import com.nnk.poseidon.exceptions.ResourceAlreadyExistsException;
 import com.nnk.poseidon.services.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -56,6 +62,11 @@ public class UserController {
     private final UserService service;
 
     /**
+     * RestTemplate to inject.
+     */
+    private final RestTemplate template;
+
+    /**
      * UserConverter to inject.
      */
     private final UserConverter converter;
@@ -67,15 +78,18 @@ public class UserController {
 
     /**
      * Instantiates a new UserController.
-     *
-     * @param userService     the UserService
+     *  @param userService     the UserService
+     * @param restTemplate RestTemplate instance that is used for
+     *                 consuming the API
      * @param userConverter   the UserConverter
      * @param passwordEncoder the PasswordEncoder
      */
     public UserController(final UserService userService,
+                          final RestTemplate restTemplate,
                           final UserConverter userConverter,
                           final PasswordEncoder passwordEncoder) {
         this.service = userService;
+        this.template = restTemplate;
         this.converter = userConverter;
         this.encoder = passwordEncoder;
     }
@@ -90,7 +104,14 @@ public class UserController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the UserController to load the"
                 + " User home page");
-        model.addAttribute(USER_LIST, service.findAllUsers());
+        String findAllUsersUrl = ApiUrlConstants.USER_API_BASE_URL + "/findAll";
+        ResponseEntity<List<UserDTO>> responseEntity = template.exchange(
+                findAllUsersUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<UserDTO>>() { }
+        );
+        model.addAttribute(USER_LIST, responseEntity.getBody());
         return "user/list";
     }
 
