@@ -2,7 +2,6 @@ package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.RatingDTO;
-import com.nnk.poseidon.services.RatingService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type Rating controller.
@@ -55,25 +52,17 @@ public class RatingController {
     private static final String REDIRECTION_LINK = "redirect:/rating/list";
 
     /**
-     * RatingService to inject.
-     */
-    private final RatingService service;
-
-    /**
      * RestTemplate to inject.
      */
     private final RestTemplate template;
 
     /**
      * Instantiates a new Rating controller.
-     *  @param ratingService   the RatingService
      * @param restTemplate RestTemplate instance that is used for
      *                 consuming the API
      */
     @Autowired
-    public RatingController(final RatingService ratingService,
-                            final RestTemplate restTemplate) {
-        this.service = ratingService;
+    public RatingController(final RestTemplate restTemplate) {
         this.template = restTemplate;
     }
 
@@ -232,14 +221,18 @@ public class RatingController {
     public String deleteRating(@RequestParam("id") final Integer id) {
         LOGGER.debug("GET request sent from the deleteRating method of the"
                 + " RatingController to delete Rating {}", id);
+        String deleteRating = ApiUrlConstants.RATING_API_BASE_URL
+                + "/delete/" + id;
         try {
-            Optional<RatingDTO> find = service.findRatingById(id);
-            if (find.isPresent()) {
-                service.deleteRating(id);
-                LOGGER.info("Rating {} delete successfully."
-                        + " Redirecting to the Rating home page", id);
-            }
-        } catch (NoSuchElementException e) {
+            template.exchange(
+                    deleteRating,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("Rating {} delete successfully."
+                    + " Redirecting to the Rating home page", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to delete Rating {}."
                     + " No matching element present", id);
             return "404NotFound/404";
