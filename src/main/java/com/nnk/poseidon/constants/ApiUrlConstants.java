@@ -20,4 +20,10 @@ public final class ApiUrlConstants {
      */
     public static final String BID_LIST_API_BASE_URL =
             "http://localhost:8080/api/bidList";
+
+    /**
+     * A constant String that refers to the CurvePoint api base url.
+     */
+    public static final String CURVE_POINT_API_BASE_URL =
+            "http://localhost:8080/api/curvePoint";
 }
