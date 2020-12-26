@@ -1,5 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.converters.CurvePointConverter;
 import com.nnk.poseidon.domain.CurvePoint;
 import com.nnk.poseidon.dto.CurvePointDTO;
@@ -7,6 +8,9 @@ import com.nnk.poseidon.services.CurvePointService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
@@ -57,20 +62,28 @@ public class CurvePointController {
     private final CurvePointService service;
 
     /**
+     * RestTemplate to inject.
+     */
+    private final RestTemplate template;
+
+    /**
      * CurvePointConverter to inject.
      */
     private final CurvePointConverter converter;
 
     /**
      * Instantiates a new CurvePointController.
-     *
-     * @param curvePointService   the CurvePointService
+     *  @param curvePointService   the CurvePointService
+     * @param restTemplate RestTemplate instance that is used for
+     *      *                     consuming the API
      * @param curvePointConverter the CurvePointConverter
      */
     @Autowired
     public CurvePointController(final CurvePointService curvePointService,
+                                final RestTemplate restTemplate,
                                 final CurvePointConverter curvePointConverter) {
         this.service = curvePointService;
+        this.template = restTemplate;
         this.converter = curvePointConverter;
     }
 
@@ -84,8 +97,15 @@ public class CurvePointController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from home method"
                 + " of the CurvePointController to load all CurvePoints");
-        List<CurvePointDTO> curvePointList = service.findAllCurvePoints();
-        model.addAttribute("curvePointList", curvePointList);
+        String findAllCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/findAll";
+        ResponseEntity<List<CurvePointDTO>> responseEntity = template.exchange(
+                findAllCurvePointUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CurvePointDTO>>() { }
+        );
+        model.addAttribute("curvePointList", responseEntity.getBody());
         return "curvePoint/list";
     }
 

@@ -10,13 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -44,6 +51,9 @@ class CurvePointControllerTest {
     @MockBean
     private CurvePointConverter converter;
 
+    @MockBean
+    private RestTemplate template;
+
     private CurvePointDTO curvePointDTO;
 
     private CurvePoint curvePoint;
@@ -59,11 +69,19 @@ class CurvePointControllerTest {
     @DisplayName("Load all CurvePoints")
     @Test
     void home_shouldReturnCurvePointHomePage_andAllCurvePoints() throws Exception {
+        List<CurvePointDTO> curvePointDTOList = new ArrayList<>();
+        curvePointDTOList.add(curvePointDTO);
+        String homeUrl = "http://localhost:8080/api/curvePoint/findAll";
+        when(template.exchange(
+                homeUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CurvePointDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(curvePointDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/curvePoint/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("curvePointList"))
                 .andExpect(view().name("curvePoint/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllCurvePoints();
     }
 
     @DisplayName("Load add CurvePont form")
