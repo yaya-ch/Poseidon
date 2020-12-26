@@ -10,13 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -42,6 +49,9 @@ class RuleNameControllerTest {
     private RuleNameService service;
 
     @MockBean
+    private RestTemplate template;
+
+    @MockBean
     private RuleNameConverter converter;
 
     private RuleName ruleName;
@@ -57,11 +67,19 @@ class RuleNameControllerTest {
     @DisplayName("Load RuleName Home page")
     @Test
     void home_shouldReturnRuleNameHomePage_andAllRuleNames() throws Exception {
+        List<RuleNameDTO> ruleNameDTOList = new ArrayList<>();
+        ruleNameDTOList.add(ruleNameDTO);
+        String findAllUrl = "http://localhost:8080/api/ruleName/findAll";
+        when(template.exchange(
+                findAllUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<RuleNameDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(ruleNameDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/ruleName/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("ruleNameList"))
                 .andExpect(view().name("ruleName/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllRuleNames();
     }
 
     @DisplayName("Load RuleName add form")

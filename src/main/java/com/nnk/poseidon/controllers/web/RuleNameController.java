@@ -1,5 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.converters.RuleNameConverter;
 import com.nnk.poseidon.domain.RuleName;
 import com.nnk.poseidon.dto.RuleNameDTO;
@@ -7,6 +8,9 @@ import com.nnk.poseidon.services.RuleNameService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,20 +60,28 @@ public class RuleNameController {
     private final RuleNameService service;
 
     /**
+     * RestTemplate to inject.
+     */
+    private final RestTemplate template;
+
+    /**
      * RuleNameConverter to inject.
      */
     private final RuleNameConverter converter;
 
     /**
      * Instantiates a new RuleNameController.
-     *
-     * @param ruleNameService   the RuleNameService
+     *  @param ruleNameService   the RuleNameService
+     * @param restTemplate RestTemplate instance that is used for
+     *                     consuming the API
      * @param ruleNameConverter the RuleNameConverter
      */
     @Autowired
     public RuleNameController(final RuleNameService ruleNameService,
+                              final RestTemplate restTemplate,
                               final RuleNameConverter ruleNameConverter) {
         this.service = ruleNameService;
+        this.template = restTemplate;
         this.converter = ruleNameConverter;
     }
 
@@ -82,8 +95,15 @@ public class RuleNameController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the"
                 + " RuleNameController to load all the RuleNames");
-        List<RuleNameDTO> findAllRuleNames = service.findAllRuleNames();
-        model.addAttribute("ruleNameList", findAllRuleNames);
+        String findAllRuleNamesUrl = ApiUrlConstants.RULE_NAME_API_BASE_URL
+                + "/findAll";
+        ResponseEntity<List<RuleNameDTO>> responseEntity = template.exchange(
+                findAllRuleNamesUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<RuleNameDTO>>() { }
+        );
+        model.addAttribute("ruleNameList", responseEntity.getBody());
         return "ruleName/list";
     }
 
