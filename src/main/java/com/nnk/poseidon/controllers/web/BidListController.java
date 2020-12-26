@@ -1,12 +1,14 @@
 package com.nnk.poseidon.controllers.web;
 
-import com.nnk.poseidon.converters.BidListConverter;
-import com.nnk.poseidon.domain.BidList;
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.BidListDTO;
-import com.nnk.poseidon.services.BidListService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,12 +18,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type Bid list controller.
@@ -57,26 +60,18 @@ public class BidListController {
     private static final String BID_LIST_LIST = "bidListList";
 
     /**
-     * BidListService to inject.
+     * RestTemplate to inject.
      */
-    private final BidListService service;
-
-    /**
-     * BidListConverter to inject.
-     */
-    private final BidListConverter converter;
+    private final RestTemplate template;
 
     /**
      * Instantiates a new Bid list controller.
-     *
-     * @param bidListService the bid list service
-     * @param bidListConverter the BidListConverter
+     * @param restTemplate RestTemplate instance that is used for
+     *                     consuming the API
      */
     @Autowired
-    public BidListController(final BidListService bidListService,
-                             final BidListConverter bidListConverter) {
-        this.service = bidListService;
-        this.converter = bidListConverter;
+    public BidListController(final RestTemplate restTemplate) {
+        this.template = restTemplate;
     }
 
     /**
@@ -89,8 +84,15 @@ public class BidListController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the bidListController"
                 + " to load all the BidLists");
-        List<BidListDTO> bidListDTOList = service.findAll();
-        model.addAttribute(BID_LIST_LIST, bidListDTOList);
+        String findAllBidListsUrl = ApiUrlConstants.BID_LIST_API_BASE_URL
+                + "/findAll";
+        ResponseEntity<List<BidListDTO>> responseEntity = template.exchange(
+                findAllBidListsUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<BidListDTO>>() { }
+        );
+        model.addAttribute(BID_LIST_LIST, responseEntity.getBody());
         return "bidList/list";
     }
 
@@ -125,6 +127,7 @@ public class BidListController {
                            final Model model) {
         LOGGER.debug("POST request sent from the BidLIstController"
                 + " to save a new BidList");
+        String addBidListUrl = ApiUrlConstants.BID_LIST_API_BASE_URL + "/add";
         if (!result.hasFieldErrors()) {
             bidListDTO.setBidListDate(
                     new Timestamp(System.currentTimeMillis()));
@@ -132,10 +135,13 @@ public class BidListController {
                     new Timestamp(System.currentTimeMillis()));
             bidListDTO.setRevisionName(null);
             bidListDTO.setRevisionDate(null);
-            BidList bidListToSave =
-                    converter.bidListDTOToBidListEntity(bidListDTO);
-            service.save(bidListToSave);
-            model.addAttribute(BID_LIST_LIST, service.findAll());
+            HttpEntity<BidListDTO> httpEntity = new HttpEntity<>(bidListDTO);
+            template.exchange(
+                    addBidListUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             return REDIRECTION_TO_BID_LIST_LIST;
         }
         LOGGER.error("Failed to validate The new BidList. AddForm reloaded");
@@ -156,12 +162,20 @@ public class BidListController {
         LOGGER.debug("GET request sent from the BidListController"
                 + " to display the update form");
         try {
-            Optional<BidListDTO> bidListToUpdate = service.findBidListById(id);
-            if (bidListToUpdate.isPresent()) {
+            String findBidIdUrl = ApiUrlConstants.BID_LIST_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<BidListDTO> responseEntity = template.exchange(
+                    findBidIdUrl,
+                    HttpMethod.GET,
+                    null,
+                    BidListDTO.class
+            );
+            if (responseEntity.hasBody()) {
                 LOGGER.info("BidList {} loaded successfully", id);
-                model.addAttribute(BID_LIST_ATTRIBUTE, bidListToUpdate.get());
+                model.addAttribute(BID_LIST_ATTRIBUTE,
+                        responseEntity.getBody());
             }
-        } catch (NoSuchElementException e) {
+        } catch (HttpStatusCodeException e) {
             LOGGER.error("Failed to load BidList {}."
                     + " No matching resource found", id);
             return "404NotFound/404";
@@ -186,12 +200,17 @@ public class BidListController {
                             final Model model) {
         LOGGER.debug("POST request sent to from the BidListController"
                 + " to update the BidList {}", id);
+        String updateBidListUrl = ApiUrlConstants.BID_LIST_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasFieldErrors()) {
             bidList.setRevisionDate(new Timestamp(System.currentTimeMillis()));
-            BidList bidListToUpdate =
-                    converter.bidListDTOToBidListEntity(bidList);
-            service.updateBidList(id, bidListToUpdate);
-            model.addAttribute(BID_LIST_LIST, service.findAll());
+            HttpEntity<BidListDTO> httpEntity = new HttpEntity<>(bidList);
+            template.exchange(
+                    updateBidListUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             return REDIRECTION_TO_BID_LIST_LIST;
         }
         LOGGER.error("Failed to validate BidList {}. Update form reloaded",
@@ -211,12 +230,16 @@ public class BidListController {
         LOGGER.debug("DELETE request sent from the BidListController"
                 + " to delete BidList {}", id);
         try {
-            Optional<BidListDTO> findBidList = service.findBidListById(id);
-            if (findBidList.isPresent()) {
-                service.deleteById(id);
-                LOGGER.info("BidList {} deleted successfully", id);
-            }
-        } catch (NoSuchElementException e) {
+            String deleteBidListUrl = ApiUrlConstants.BID_LIST_API_BASE_URL
+                    + "/delete/" + id;
+            template.exchange(
+                    deleteBidListUrl,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("BidList {} deleted successfully", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Deletion failed. Failed to delete BidList {}", id);
             return "404NotFound/404";
         }
