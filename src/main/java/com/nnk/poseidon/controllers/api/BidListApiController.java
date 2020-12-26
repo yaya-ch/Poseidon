@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This controller provides api endpoints.
@@ -104,7 +103,7 @@ public class BidListApiController {
      */
     @ApiOperation(value = "Retrieve a BidList by its id from database")
     @GetMapping("/findById/{id}")
-    public Optional<BidListDTO> findBidListById(
+    public BidListDTO findBidListById(
             @PathVariable final Integer id) {
         LOGGER.debug("GET request sent from the findBidListById"
                 + " of the BidListApiController to load BidList {}", id);

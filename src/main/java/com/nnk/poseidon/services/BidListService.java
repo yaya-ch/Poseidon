@@ -4,7 +4,6 @@ import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The interface BidList service.
@@ -39,7 +38,7 @@ public interface BidListService {
      * @param id the id
      * @return the BidList
      */
-    Optional<BidListDTO> findBidListById(Integer id);
+    BidListDTO findBidListById(Integer id);
 
     /**
      * Delete a BidList by id.

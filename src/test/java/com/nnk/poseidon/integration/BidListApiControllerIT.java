@@ -63,9 +63,9 @@ class BidListApiControllerIT {
     @Test
     void givenExistingId_whenFindById_thenCorrectBidListShouldBeReturnedFromDB() {
 
-        Optional<BidListDTO> bidListToRetrieve = apiController.findBidListById(validBidListId);
-        assertTrue(bidListToRetrieve.isPresent());
-        assertEquals("Account", bidListToRetrieve.get().getAccount());
+        BidListDTO bidListToRetrieve = apiController.findBidListById(validBidListId);
+        assertNotNull(bidListToRetrieve);
+        assertEquals("Account", bidListToRetrieve.getAccount());
     }
 
     @DisplayName("FindById throws exception when no id matches")
