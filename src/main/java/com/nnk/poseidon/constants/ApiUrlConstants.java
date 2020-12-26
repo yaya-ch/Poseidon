@@ -28,8 +28,14 @@ public final class ApiUrlConstants {
             "http://localhost:8080/api/curvePoint";
 
     /**
-     * A constant String that refers to the CurvePoint api base url.
+     * A constant String that refers to the Rating api base url.
      */
     public static final String RATING_API_BASE_URL =
             "http://localhost:8080/api/rating";
+
+    /**
+     * A constant String that refers to the RuleName api base url.
+     */
+    public static final String RULE_NAME_API_BASE_URL =
+            "http://localhost:8080/api/ruleName";
 }
