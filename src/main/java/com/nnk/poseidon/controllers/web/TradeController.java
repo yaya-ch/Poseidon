@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -143,16 +144,20 @@ public class TradeController {
                            final Model model) {
         LOGGER.debug("POST request sent from the TradeController"
                 + " to save a new Trade");
+        String addTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
             trade.setTradeDate(new Timestamp(System.currentTimeMillis()));
             trade.setCreationDate(new Timestamp(System.currentTimeMillis()));
             trade.setRevisionName(null);
             trade.setRevisionDate(null);
-            Trade tradeToSave =
-                    converter.tradeDTOToTradeEntityConverter(trade);
-            service.saveTrade(tradeToSave);
+            HttpEntity<TradeDTO> httpEntity = new HttpEntity<>(trade);
+            template.exchange(
+                    addTradeUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("new Trade saved successfully by the TradeController");
-            model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
             return REDIRECTION_LINK;
         } else {
             LOGGER.error("Failed to save the Trade. Add form reloaded");
