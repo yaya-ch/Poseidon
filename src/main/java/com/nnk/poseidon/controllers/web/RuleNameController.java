@@ -2,7 +2,6 @@ package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.RuleNameDTO;
-import com.nnk.poseidon.services.RuleNameService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type RuleName controller.
@@ -55,25 +52,17 @@ public class RuleNameController {
     private static final String REDIRECTION_LINK = "redirect:/ruleName/list";
 
     /**
-     * RuleNameService to inject.
-     */
-    private final RuleNameService service;
-
-    /**
      * RestTemplate to inject.
      */
     private final RestTemplate template;
 
     /**
      * Instantiates a new RuleNameController.
-     *  @param ruleNameService   the RuleNameService
      * @param restTemplate RestTemplate instance that is used for
      *                     consuming the API
      */
     @Autowired
-    public RuleNameController(final RuleNameService ruleNameService,
-                              final RestTemplate restTemplate) {
-        this.service = ruleNameService;
+    public RuleNameController(final RestTemplate restTemplate) {
         this.template = restTemplate;
     }
 
@@ -232,12 +221,16 @@ public class RuleNameController {
         LOGGER.debug("GET request sent from"
                 + " RuleNameController to delete RuleName {}", id);
         try {
-            Optional<RuleNameDTO> find = service.findRuleNameById(id);
-            if (find.isPresent()) {
-                service.deleteRuleName(id);
-                LOGGER.info("RuleName {} deleted successfully", id);
-            }
-        } catch (NoSuchElementException e) {
+            String deleteUrl = ApiUrlConstants.RULE_NAME_API_BASE_URL
+                    + "/delete/" + id;
+            template.exchange(
+                    deleteUrl,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("RuleName {} deleted successfully", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to delete RuleName {}."
                     + " No Resource found for the provided id.", id);
             return "404NotFound/404";
