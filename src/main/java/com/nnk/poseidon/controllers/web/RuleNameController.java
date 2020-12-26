@@ -1,8 +1,6 @@
 package com.nnk.poseidon.controllers.web;
 
 import com.nnk.poseidon.constants.ApiUrlConstants;
-import com.nnk.poseidon.converters.RuleNameConverter;
-import com.nnk.poseidon.domain.RuleName;
 import com.nnk.poseidon.dto.RuleNameDTO;
 import com.nnk.poseidon.services.RuleNameService;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -66,24 +65,16 @@ public class RuleNameController {
     private final RestTemplate template;
 
     /**
-     * RuleNameConverter to inject.
-     */
-    private final RuleNameConverter converter;
-
-    /**
      * Instantiates a new RuleNameController.
      *  @param ruleNameService   the RuleNameService
      * @param restTemplate RestTemplate instance that is used for
      *                     consuming the API
-     * @param ruleNameConverter the RuleNameConverter
      */
     @Autowired
     public RuleNameController(final RuleNameService ruleNameService,
-                              final RestTemplate restTemplate,
-                              final RuleNameConverter ruleNameConverter) {
+                              final RestTemplate restTemplate) {
         this.service = ruleNameService;
         this.template = restTemplate;
-        this.converter = ruleNameConverter;
     }
 
     /**
@@ -171,13 +162,20 @@ public class RuleNameController {
         LOGGER.debug("GET request sent from"
                 + " RuleNameController to load the RuleName Update form");
         try {
-            Optional<RuleNameDTO> ruleNameToUpdate =
-                    service.findRuleNameById(id);
-            if (ruleNameToUpdate.isPresent()) {
+            String findRuleNameById = ApiUrlConstants.RULE_NAME_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<RuleNameDTO> responseEntity = template.exchange(
+                    findRuleNameById,
+                    HttpMethod.GET,
+                    null,
+                    RuleNameDTO.class
+            );
+            if (responseEntity.hasBody()) {
                 LOGGER.info("RuleName {} Loaded successfully", id);
-                model.addAttribute(RULE_NAME_ATTRIBUTE, ruleNameToUpdate.get());
+                model.addAttribute(RULE_NAME_ATTRIBUTE,
+                        responseEntity.getBody());
             }
-        } catch (NoSuchElementException e) {
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load RuleName {}."
                     + " No matching resource is present", id);
             return "404NotFound/404";
@@ -204,12 +202,17 @@ public class RuleNameController {
                                  final Model model) {
         LOGGER.debug("POST request sent from the"
                 + " RuleNameController to update RuleName {}", id);
+        String updateRuleName = ApiUrlConstants.RULE_NAME_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
-            RuleName ruleNameToUpdate =
-                    converter.ruleNamDTOToRuleNameConverter(ruleNameDTO);
-            service.updateRuleName(id, ruleNameToUpdate);
+            HttpEntity<RuleNameDTO> httpEntity = new HttpEntity<>(ruleNameDTO);
+            template.exchange(
+                    updateRuleName,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("RuleName {} updated successfully", id);
-            model.addAttribute("ruleNameList", service.findAllRuleNames());
             return  REDIRECTION_LINK;
         }
         LOGGER.error("Failed to save RuleName {}. Update form reloaded", id);
