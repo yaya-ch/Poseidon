@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
@@ -183,13 +184,18 @@ public class UserController {
             final Model model) {
         LOGGER.debug("GET request sent from the UserController to load the"
                 + " updateForm and update User {}", id);
+        String findUserByIdUrl = ApiUrlConstants.USER_API_BASE_URL
+                + "/findById/" + id;
         try {
-            Optional<UserDTO> userDTO = service.findById(id);
-            if (userDTO.isPresent()) {
-                LOGGER.info("updateForm loaded successfully");
-                model.addAttribute("user", userDTO.get());
-            }
-        } catch (NoSuchElementException e) {
+            ResponseEntity<UserDTO> responseEntity = template.exchange(
+                    findUserByIdUrl,
+                    HttpMethod.GET,
+                    null,
+                    UserDTO.class
+            );
+            model.addAttribute("user", responseEntity.getBody());
+            LOGGER.info("updateForm loaded successfully");
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load User {}."
                     + " No matching resource is present", id);
             return "404NotFound/404";

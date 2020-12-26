@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -121,7 +122,13 @@ class UserControllerTest {
     @DisplayName("Load the updateForm successfully")
     @Test
     void givenCorrectUserId_whenShowUpdateForm_thenUpdateFormShouldBeReturned() throws Exception {
-        when(service.findById(anyInt())).thenReturn(Optional.of(userDTO));
+        String findByIdUrl = "http://localhost:8080/api/user/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                UserDTO.class
+        )).thenReturn(new ResponseEntity<>(userDTO, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/update?id=1"))
                 .andExpect(model().attributeExists("user"))
                 .andExpect(view().name("user/update"))
@@ -131,7 +138,13 @@ class UserControllerTest {
     @DisplayName("Load 404 error page instead of updateForm when User id is incorrect")
     @Test
     void givenIncorrectUserId_whenShowUpdateForm_then404ErrorPageShouldBeLoaded() throws Exception {
-        when(service.findById(anyInt())).thenThrow(NoSuchElementException.class);
+        String findByIdUrl = "http://localhost:8080/api/user/findById/1";
+        when(template.exchange(
+                findByIdUrl,
+                HttpMethod.GET,
+                null,
+                UserDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/user/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andExpect(status().isOk()).andReturn();
