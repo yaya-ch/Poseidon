@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -126,7 +127,6 @@ class CurvePointControllerTest {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @Disabled("This test will be refactored")
     @DisplayName("UPDATE CurvePoint: Invalid CurvePoint id returns the error page")
     @Test
     void givenInvalidCurvePointId_whenShowUpdateForm_then404ErrorPageShouldBeReturned() throws Exception {
@@ -136,7 +136,7 @@ class CurvePointControllerTest {
                 HttpMethod.GET,
                 null,
                 CurvePointDTO.class
-        )).thenReturn(new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/curvePoint/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();
@@ -175,10 +175,16 @@ class CurvePointControllerTest {
                 .andExpect(redirectedUrl("/curvePoint/list"));
     }
 
-    @Disabled("This test will be refactored to pass")
     @DisplayName("DELETE CurvePoint redirect to 404 not found page")
     @Test
     void givenInvalidCurvePointId_whenDeleteCurvePoint_then404ErrorPageShouldBeReturned() throws Exception {
+        String deleteCurveUrl = "http://localhost:8080/api/curvePoint/delete/1";
+        when(template.exchange(
+                deleteCurveUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/curvePoint/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();

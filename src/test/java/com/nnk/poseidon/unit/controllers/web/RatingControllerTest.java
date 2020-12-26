@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -113,9 +114,9 @@ class RatingControllerTest {
     @DisplayName("Load the Rating update form")
     @Test
     void showUpdateForm_shouldLoadTheUpdateForm() throws Exception {
-        String findById = "http://localhost:8080/api/rating/findById/1";
+        String findRatingByIdUrl = "http://localhost:8080/api/rating/findById/1";
         when(template.exchange(
-                findById,
+                findRatingByIdUrl,
                 HttpMethod.GET,
                 null,
                 RatingDTO.class
@@ -126,10 +127,16 @@ class RatingControllerTest {
                 .andExpect(status().isOk()).andReturn();
     }
 
-    @Disabled("This test will be refactored")
     @DisplayName("Invalid rating id loads 404 page instead of the RatingUpdateForm")
     @Test
     void givenInvalidRatingId_showUpdateForm_then404ErrorPageShouldBeLoaded() throws Exception {
+        String findRatingByIdUrl = "http://localhost:8080/api/rating/findById/1";
+        when(template.exchange(
+                findRatingByIdUrl,
+                HttpMethod.GET,
+                null,
+                RatingDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();
@@ -171,10 +178,16 @@ class RatingControllerTest {
                 .andExpect(status().is3xxRedirection()).andReturn();
     }
 
-    @Disabled("This test will be refactored")
     @DisplayName("DELETE: invalid Rating id returns 404 error page")
     @Test
     void givenInvalidRatingId_whenDeleteRating_then404ErrorPageShouldBeLoaded() throws Exception {
+        String deleteRatingUrl = "http://localhost:8080/api/rating/delete/1";
+        when(template.exchange(
+                deleteRatingUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();
