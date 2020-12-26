@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -139,13 +140,17 @@ public class RuleNameController {
                            final Model model) {
         LOGGER.debug("POST request sent from the"
                 + " RuleNameController to save a new RuleName");
+        String addRuleName = ApiUrlConstants.RULE_NAME_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
-            RuleName ruleNameToSave =
-                    converter.ruleNamDTOToRuleNameConverter(ruleNameDTO);
-            service.saveRuleName(ruleNameToSave);
+            HttpEntity<RuleNameDTO> httpEntity = new HttpEntity<>(ruleNameDTO);
+            template.exchange(
+                    addRuleName,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("New RuleName saved successfully"
                     + " by the RuleNameController");
-            model.addAttribute(RULE_NAME_ATTRIBUTE, ruleNameToSave);
             return REDIRECTION_LINK;
         }
         LOGGER.error("Failed to save the new RuleName. Add form reloaded");

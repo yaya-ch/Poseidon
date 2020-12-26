@@ -1,6 +1,5 @@
 package com.nnk.poseidon.unit.controllers.web;
 
-import com.nnk.poseidon.converters.RuleNameConverter;
 import com.nnk.poseidon.domain.RuleName;
 import com.nnk.poseidon.dto.RuleNameDTO;
 import com.nnk.poseidon.services.RuleNameService;
@@ -51,9 +50,6 @@ class RuleNameControllerTest {
     @MockBean
     private RestTemplate template;
 
-    @MockBean
-    private RuleNameConverter converter;
-
     private RuleName ruleName;
     private RuleNameDTO ruleNameDTO;
     @BeforeEach
@@ -94,7 +90,6 @@ class RuleNameControllerTest {
     @DisplayName("POST: save a valid RuleName successfully")
     @Test
     void givenValidRuleName_whenSavingNewRuleName_thenResponseShouldRedirectionToHomePage() throws Exception {
-        when(converter.ruleNamDTOToRuleNameConverter(any(RuleNameDTO.class))).thenReturn(ruleName);
         mockMvc.perform(MockMvcRequestBuilders.post("/ruleName/validate")
                 .param("name", ruleName.getName())
                 .param("description", ruleName.getDescription())
@@ -110,7 +105,6 @@ class RuleNameControllerTest {
     @DisplayName("POST: save a invalid RuleName reloads the add form")
     @Test
     void givenInvalidRuleName_whenSavingNewRuleName_thenAddFormShouldBeReloaded() throws Exception {
-        when(converter.ruleNamDTOToRuleNameConverter(any(RuleNameDTO.class))).thenReturn(ruleName);
         mockMvc.perform(MockMvcRequestBuilders.post("/ruleName/validate")
                 .param("name", "")
                 .param("description", ruleName.getDescription())
