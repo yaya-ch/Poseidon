@@ -159,11 +159,9 @@ public class RuleNameController {
                     null,
                     RuleNameDTO.class
             );
-            if (responseEntity.hasBody()) {
-                LOGGER.info("RuleName {} Loaded successfully", id);
-                model.addAttribute(RULE_NAME_ATTRIBUTE,
-                        responseEntity.getBody());
-            }
+            model.addAttribute(RULE_NAME_ATTRIBUTE, responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update RuleName {}", id);
         } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load RuleName {}."
                     + " No matching resource is present", id);

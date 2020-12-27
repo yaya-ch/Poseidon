@@ -37,7 +37,8 @@ public @interface ValidPassword {
     };
 
     /**
-     * Specifies the payload with which the constraint declaration is associated.
+     * Specifies the payload with which the constraint.
+     * declaration is associated
      * @return an object that extends Payload
      */
     Class<? extends Payload>[] payload() default {

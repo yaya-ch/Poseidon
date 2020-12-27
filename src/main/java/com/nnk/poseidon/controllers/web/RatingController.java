@@ -162,10 +162,9 @@ public class RatingController {
                     null,
                     RatingDTO.class
             );
-            if (responseEntity.hasBody()) {
-                LOGGER.info("Rating {} loaded successfully", id);
-                model.addAttribute(RATING_ATTRIBUTE, responseEntity.getBody());
-            }
+            model.addAttribute(RATING_ATTRIBUTE, responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update Rating {}", id);
         } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load Rating {}. No matching item present",
                     id);

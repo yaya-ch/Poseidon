@@ -168,10 +168,9 @@ public class TradeController {
                     null,
                     TradeDTO.class
             );
-            if (responseEntity.hasBody()) {
-                LOGGER.info("Update form loaded successfully");
-                model.addAttribute(TRADE_ATTRIBUTE, responseEntity.getBody());
-            }
+            model.addAttribute(TRADE_ATTRIBUTE, responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update Trade {}", id);
         } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load Trade {}."
                     + " No matching resource is present", id);
