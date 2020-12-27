@@ -104,7 +104,7 @@ public class CustomPasswordValidator
                         //No white space is allowed
                         new WhitespaceRule()
         ));
-        //Compare the provided password to the difined rules.
+        //Compare the provided password to the defined rules.
         RuleResult result = validator.validate(new PasswordData(password));
         //Validate the password when all rules are respected
         if (result.isValid()) {
