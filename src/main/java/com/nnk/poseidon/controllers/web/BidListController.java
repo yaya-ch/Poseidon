@@ -170,11 +170,9 @@ public class BidListController {
                     null,
                     BidListDTO.class
             );
-            if (responseEntity.hasBody()) {
-                LOGGER.info("BidList {} loaded successfully", id);
-                model.addAttribute(BID_LIST_ATTRIBUTE,
-                        responseEntity.getBody());
-            }
+            model.addAttribute(BID_LIST_ATTRIBUTE, responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update BidList {}", id);
         } catch (HttpStatusCodeException e) {
             LOGGER.error("Failed to load BidList {}."
                     + " No matching resource found", id);

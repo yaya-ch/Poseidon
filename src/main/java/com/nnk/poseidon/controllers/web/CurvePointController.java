@@ -163,12 +163,10 @@ public class CurvePointController {
                     null,
                     CurvePointDTO.class
             );
-            if (responseEntity.hasBody()) {
-                LOGGER.debug("CurvePoint {} loaded successfully"
-                        + " in the updateForm", id);
-                model.addAttribute(CURVE_POINT_ATTRIBUTE,
-                        responseEntity.getBody());
-            }
+            model.addAttribute(CURVE_POINT_ATTRIBUTE,
+                    responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update CurvePoint {}", id);
         } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load CurvePoint {}", id);
             return "404NotFound/404";
