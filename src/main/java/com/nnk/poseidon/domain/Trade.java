@@ -180,62 +180,6 @@ public class Trade {
     private String side;
 
     /**
-     * Class constructor.
-     * @param tAccount account
-     * @param tType type
-     * @param tBuyQuantity buyQuantity
-     * @param tSellQuantity sellQuantity
-     * @param tBuyPrice buyPrice
-     * @param tSellPrice sellPrice
-     * @param tBenchmark benchmark
-     * @param tTradeDate tradeDate
-     * @param tSecurity security
-     * @param tStatus status
-     * @param tTrader trader
-     * @param tBook book
-     * @param tCreationName creationName
-     * @param tCreationDate creationDate
-     * @param tRevisionName revisionName
-     * @param tRevisionDate revisionDate
-     * @param tDealName dealName
-     * @param tDealType dealType
-     * @param tSourceListId sourceListId
-     * @param tSide side
-     */
-    public Trade(final @NotNull @NotBlank String tAccount,
-                 final @NotNull @NotBlank String tType,
-                 final Double tBuyQuantity, final Double tSellQuantity,
-                 final Double tBuyPrice, final Double tSellPrice,
-                 final String tBenchmark, final Timestamp tTradeDate,
-                 final String tSecurity, final String tStatus,
-                 final String tTrader, final String tBook,
-                 final String tCreationName, final Timestamp tCreationDate,
-                 final String tRevisionName, final Timestamp tRevisionDate,
-                 final String tDealName, final String tDealType,
-                 final String tSourceListId, final String tSide) {
-        this.account = tAccount;
-        this.type = tType;
-        this.buyQuantity = tBuyQuantity;
-        this.sellQuantity = tSellQuantity;
-        this.buyPrice = tBuyPrice;
-        this.sellPrice = tSellPrice;
-        this.benchmark = tBenchmark;
-        this.tradeDate = new Timestamp(tTradeDate.getTime());
-        this.security = tSecurity;
-        this.status = tStatus;
-        this.trader = tTrader;
-        this.book = tBook;
-        this.creationName = tCreationName;
-        this.creationDate = new Timestamp(tCreationDate.getTime());
-        this.revisionName = tRevisionName;
-        this.revisionDate = new Timestamp(tRevisionDate.getTime());
-        this.dealName = tDealName;
-        this.dealType = tDealType;
-        this.sourceListId = tSourceListId;
-        this.side = tSide;
-    }
-
-    /**
      * tradeDate getter.
      * @return trade date
      */
