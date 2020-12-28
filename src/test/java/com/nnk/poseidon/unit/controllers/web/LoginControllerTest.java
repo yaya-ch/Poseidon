@@ -69,4 +69,12 @@ class LoginControllerTest {
                 .andExpect(redirectedUrl("http://localhost/login"))
                 .andExpect(status().is3xxRedirection());
     }
+
+    @DisplayName("/forbidden returns the 403 error page")
+    @Test
+    void error_shouldReturnThe403ErrorPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/forbidden"))
+                .andExpect(view().name("403"))
+                .andExpect(status().isOk());
+    }
 }

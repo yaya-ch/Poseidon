@@ -72,7 +72,8 @@ public class PoseidonSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/login")
                 .defaultSuccessUrl("/bidList/list")
                 .failureUrl("/login").permitAll()
-                .and().logout().logoutUrl("/logout").permitAll();
+                .and().logout().logoutUrl("/logout").permitAll()
+                .and().exceptionHandling().accessDeniedPage("/forbidden");
     }
 
     /**
