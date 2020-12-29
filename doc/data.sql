@@ -95,6 +95,6 @@ CREATE TABLE user (
 );
 
 insert into user(full_name, username, password, role)
-values("Administrator", "admin", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "ADMIN");
+values("Administrator", "admin", "$2a$15$V6kP607Xgq4IdMsMADyqIOjHkjIAtV7yu/kcYZBTBQCvABklOtxRy", "ROLE_ADMIN");
 insert into user(full_name, username, password, role)
-values("User", "user", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "USER")
+values("User", "user", "$2a$15$V6kP607Xgq4IdMsMADyqIOjHkjIAtV7yu/kcYZBTBQCvABklOtxRy", "ROLE_USER")
