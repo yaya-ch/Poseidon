@@ -9,7 +9,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -59,20 +58,12 @@ public class UserController {
     private final RestTemplate template;
 
     /**
-     * PasswordEncoder to inject.
-     */
-    private final PasswordEncoder encoder;
-
-    /**
      * Instantiates a new UserController.
      * @param restTemplate RestTemplate instance that is used for
      *                 consuming the API
-     * @param passwordEncoder the PasswordEncoder
      */
-    public UserController(final RestTemplate restTemplate,
-                          final PasswordEncoder passwordEncoder) {
+    public UserController(final RestTemplate restTemplate) {
         this.template = restTemplate;
-        this.encoder = passwordEncoder;
     }
 
     /**
@@ -131,7 +122,6 @@ public class UserController {
                 + " to save new User");
         String addUserUrl = ApiUrlConstants.USER_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
-            user.setPassword(encoder.encode(user.getPassword()));
             HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
             template.exchange(
                     addUserUrl,
@@ -202,7 +192,6 @@ public class UserController {
         String updateUserUrl = ApiUrlConstants.USER_API_BASE_URL
                 + "/update/" + id;
         if (!result.hasErrors()) {
-            user.setPassword(encoder.encode(user.getPassword()));
             HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
             template.exchange(
                     updateUserUrl,

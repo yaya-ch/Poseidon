@@ -66,16 +66,15 @@ public class LoginController {
     }
 
     /**
-     * Error model and view.
+     * Access denied.
      *
-     * @return the model and view
+     * @return an access denied html page if a non authorized
+     * user tries to access content
      */
-    @GetMapping("/error")
-    public ModelAndView error() {
-        ModelAndView mav = new ModelAndView();
-        String errorMessage = "You are not authorized for the requested data.";
-        mav.addObject("errorMsg", errorMessage);
-        mav.setViewName("403");
-        return mav;
+    @GetMapping("/forbidden")
+    public String error() {
+        LOGGER.debug("Non-authorized user tried"
+                + " to access some forbidden content");
+        return "403";
     }
 }
