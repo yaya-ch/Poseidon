@@ -1,24 +1,28 @@
 package com.nnk.poseidon.unit.controllers.web;
 
-import com.nnk.poseidon.converters.RatingConverter;
 import com.nnk.poseidon.domain.Rating;
 import com.nnk.poseidon.dto.RatingDTO;
-import com.nnk.poseidon.services.RatingService;
 import com.nnk.poseidon.unit.DataLoader;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,10 +43,7 @@ class RatingControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private RatingService service;
-
-    @MockBean
-    private RatingConverter converter;
+    private RestTemplate template;
 
     private Rating rating;
     private RatingDTO ratingDTO;
@@ -58,11 +59,19 @@ class RatingControllerTest {
     @DisplayName("Load the Rating home page")
     @Test
     void home_shouldReturnRatingHomePage_andAllRatings() throws Exception {
+        List<RatingDTO> ratingDTOList = new ArrayList<>();
+        ratingDTOList.add(ratingDTO);
+        String findAllRatingsUrl = "http://localhost:8080/api/rating/findAll";
+        when(template.exchange(
+                findAllRatingsUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<RatingDTO>>() { }
+        )).thenReturn(new ResponseEntity<>(ratingDTOList, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/list"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("ratingList"))
                 .andExpect(view().name("rating/list"))
                 .andExpect(status().isOk());
-        verify(service, times(1)).findAllRatings();
     }
 
     @DisplayName("Load the addForm html page")
@@ -77,8 +86,6 @@ class RatingControllerTest {
     @DisplayName("POST: save a valid Rating successfully")
     @Test
     void givenValidRating_whenSavingNewRating_thenResponseShouldBeOk_andRatingHomeShouldBeLoaded() throws Exception {
-        when(converter.ratingDTOToRatingEntityConverter(any(RatingDTO.class))).thenReturn(rating);
-        ratingDTO.setId(1);
         mockMvc.perform(MockMvcRequestBuilders.post("/rating/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("moodysRating", rating.getMoodysRating())
@@ -93,8 +100,6 @@ class RatingControllerTest {
     @DisplayName("POST: saving invalid fails and loads the addForm")
     @Test
     void givenInvalidRating_whenSavingNewRating_thenAddRatingFormShouldBeReloaded() throws Exception {
-        when(converter.ratingDTOToRatingEntityConverter(any(RatingDTO.class))).thenReturn(rating);
-        ratingDTO.setId(1);
         mockMvc.perform(MockMvcRequestBuilders.post("/rating/validate")
                 .contentType(MediaType.TEXT_HTML)
                 .param("moodysRating", "")
@@ -109,7 +114,13 @@ class RatingControllerTest {
     @DisplayName("Load the Rating update form")
     @Test
     void showUpdateForm_shouldLoadTheUpdateForm() throws Exception {
-        when(service.findRatingById(anyInt())).thenReturn(Optional.of(ratingDTO));
+        String findRatingByIdUrl = "http://localhost:8080/api/rating/findById/1";
+        when(template.exchange(
+                findRatingByIdUrl,
+                HttpMethod.GET,
+                null,
+                RatingDTO.class
+        )).thenReturn(new ResponseEntity<>(ratingDTO, HttpStatus.OK));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/update?id=1"))
                 .andExpect(MockMvcResultMatchers.model().attributeExists("rating"))
                 .andExpect(view().name("rating/update"))
@@ -119,7 +130,13 @@ class RatingControllerTest {
     @DisplayName("Invalid rating id loads 404 page instead of the RatingUpdateForm")
     @Test
     void givenInvalidRatingId_showUpdateForm_then404ErrorPageShouldBeLoaded() throws Exception {
-        when(service.findRatingById(anyInt())).thenThrow(NoSuchElementException.class);
+        String findRatingByIdUrl = "http://localhost:8080/api/rating/findById/1";
+        when(template.exchange(
+                findRatingByIdUrl,
+                HttpMethod.GET,
+                null,
+                RatingDTO.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/update?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();
@@ -156,17 +173,21 @@ class RatingControllerTest {
     @DisplayName("DELETE: Delete a Rating successfully and redirecting to the Rating home page")
     @Test
     void givenValidRatingId_whenDeleteRating_thenResponseShouldBeRedirection() throws Exception {
-        when(service.findRatingById(anyInt())).thenReturn(Optional.of(ratingDTO));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/delete?id=1"))
                 .andExpect(redirectedUrl("/rating/list"))
                 .andExpect(status().is3xxRedirection()).andReturn();
-        verify(service, times(1)).deleteRating(1);
     }
 
     @DisplayName("DELETE: invalid Rating id returns 404 error page")
     @Test
     void givenInvalidRatingId_whenDeleteRating_then404ErrorPageShouldBeLoaded() throws Exception {
-        when(service.findRatingById(anyInt())).thenThrow(NoSuchElementException.class);
+        String deleteRatingUrl = "http://localhost:8080/api/rating/delete/1";
+        when(template.exchange(
+                deleteRatingUrl,
+                HttpMethod.DELETE,
+                null,
+                String.class
+        )).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         mockMvc.perform(MockMvcRequestBuilders.get("/rating/delete?id=1"))
                 .andExpect(view().name("404NotFound/404"))
                 .andReturn();

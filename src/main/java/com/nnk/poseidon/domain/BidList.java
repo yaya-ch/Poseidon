@@ -2,10 +2,12 @@ package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -26,6 +28,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "bid_list")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter(AccessLevel.PUBLIC)
 @Setter(AccessLevel.PUBLIC)
 @ToString
@@ -42,23 +45,26 @@ public class BidList {
     /**
      * account.
      */
+    @NonNull
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     @Column(name = "account", length = ConstantNumbers.THIRTY)
     private String account;
 
     /**
      * type.
      */
+    @NonNull
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type is mandatory")
     @Column(name = "type", length = ConstantNumbers.THIRTY)
     private String type;
 
     /**
      * bid quantity.
      */
-    @NotNull
+    @NonNull
+    @NotNull(message = "Bid quantity is mandatory and must be a number")
     @Column(name = "bid_quantity")
     private Double bidQuantity;
 
@@ -181,87 +187,6 @@ public class BidList {
     @Column(name = "side",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String side;
-
-    /**
-     * Class constructor.
-     * @param bAccount account
-     * @param bType type
-     * @param bQuantity bidQuantity
-     * @param aQuantity askQuantity
-     * @param bBid bid
-     * @param bAsk ask
-     * @param bBenchmark benchmark
-     * @param bListDate bidListDate
-     * @param bCommentary commentary
-     * @param bSecurity security
-     * @param bStatus status
-     * @param bTrader trader
-     * @param bBook book
-     * @param bCreationName creationName
-     * @param bCreationDate creationDate
-     * @param bRevisionName revisionName
-     * @param bRevisionDate revisionDate
-     * @param bDealName dealName
-     * @param bDealType dealType
-     * @param bSourceListId sourceListId
-     * @param bSide side
-     */
-    public BidList(final @NotNull @NotBlank String bAccount,
-                   final @NotNull @NotBlank String bType,
-                   final @NotNull Double bQuantity,
-                   final Double aQuantity,
-                   final Double bBid,
-                   final Double bAsk,
-                   final String bBenchmark,
-                   final Timestamp bListDate,
-                   final String bCommentary,
-                   final String bSecurity,
-                   final String bStatus,
-                   final String bTrader,
-                   final String bBook,
-                   final String bCreationName,
-                   final Timestamp bCreationDate,
-                   final String bRevisionName,
-                   final Timestamp bRevisionDate,
-                   final String bDealName,
-                   final String bDealType,
-                   final String bSourceListId, final String bSide) {
-        this.account = bAccount;
-        this.type = bType;
-        this.bidQuantity = bQuantity;
-        this.askQuantity = aQuantity;
-        this.bid = bBid;
-        this.ask = bAsk;
-        this.benchmark = bBenchmark;
-        this.bidListDate = new Timestamp(bListDate.getTime());
-        this.commentary = bCommentary;
-        this.security = bSecurity;
-        this.status = bStatus;
-        this.trader = bTrader;
-        this.book = bBook;
-        this.creationName = bCreationName;
-        this.creationDate = new Timestamp(bCreationDate.getTime());
-        this.revisionName = bRevisionName;
-        this.revisionDate = new Timestamp(bRevisionDate.getTime());
-        this.dealName = bDealName;
-        this.dealType = bDealType;
-        this.sourceListId = bSourceListId;
-        this.side = bSide;
-    }
-
-    /**
-     * Class constructor.
-     * @param bAccount account
-     * @param bType type
-     * @param bQuantity bid quantity
-     */
-    public BidList(@NotNull @NotBlank final String bAccount,
-                   @NotNull @NotBlank final String bType,
-                   @NotNull @NotBlank final Double bQuantity) {
-        this.account = bAccount;
-        this.type = bType;
-        this.bidQuantity = bQuantity;
-    }
 
     /**
      *  bidListDate getter.

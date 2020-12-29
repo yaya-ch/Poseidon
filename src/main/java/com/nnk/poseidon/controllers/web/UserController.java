@@ -1,13 +1,14 @@
 package com.nnk.poseidon.controllers.web;
 
-import com.nnk.poseidon.converters.UserConverter;
-import com.nnk.poseidon.domain.User;
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.UserDTO;
 import com.nnk.poseidon.exceptions.ResourceAlreadyExistsException;
-import com.nnk.poseidon.services.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.List;
 
 /**
  * The type UserController controller.
@@ -50,33 +53,17 @@ public class UserController {
     private static final String REDIRECTION_LINK = "redirect:/user/list";
 
     /**
-     * UserService to inject.
+     * RestTemplate to inject.
      */
-    private final UserService service;
-
-    /**
-     * UserConverter to inject.
-     */
-    private final UserConverter converter;
-
-    /**
-     * PasswordEncoder to inject.
-     */
-    private final PasswordEncoder encoder;
+    private final RestTemplate template;
 
     /**
      * Instantiates a new UserController.
-     *
-     * @param userService     the UserService
-     * @param userConverter   the UserConverter
-     * @param passwordEncoder the PasswordEncoder
+     * @param restTemplate RestTemplate instance that is used for
+     *                 consuming the API
      */
-    public UserController(final UserService userService,
-                          final UserConverter userConverter,
-                          final PasswordEncoder passwordEncoder) {
-        this.service = userService;
-        this.converter = userConverter;
-        this.encoder = passwordEncoder;
+    public UserController(final RestTemplate restTemplate) {
+        this.template = restTemplate;
     }
 
     /**
@@ -89,7 +76,14 @@ public class UserController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the UserController to load the"
                 + " User home page");
-        model.addAttribute(USER_LIST, service.findAllUsers());
+        String findAllUsersUrl = ApiUrlConstants.USER_API_BASE_URL + "/findAll";
+        ResponseEntity<List<UserDTO>> responseEntity = template.exchange(
+                findAllUsersUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<UserDTO>>() { }
+        );
+        model.addAttribute(USER_LIST, responseEntity.getBody());
         return "user/list";
     }
 
@@ -120,18 +114,22 @@ public class UserController {
      *                                      username already exists in database
      */
     @PostMapping("/validate")
-    public String validate(@Valid final UserDTO user,
+    public String validate(@Valid @ModelAttribute("user") final UserDTO user,
                            final BindingResult result,
                            final Model model)
             throws ResourceAlreadyExistsException {
         LOGGER.debug("POST request sent from the UserController"
                 + " to save new User");
+        String addUserUrl = ApiUrlConstants.USER_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
-            user.setPassword(encoder.encode(user.getPassword()));
-            User userToSave = converter.userDTOToUserEntityConverter(user);
-            service.saveNewUser(userToSave);
+            HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
+            template.exchange(
+                    addUserUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("User saved successfully by the UserController");
-            model.addAttribute(USER_LIST, service.findAllUsers());
             return REDIRECTION_LINK;
         } else {
             LOGGER.error("Failed to save the User because of invalid input."
@@ -155,13 +153,18 @@ public class UserController {
             final Model model) {
         LOGGER.debug("GET request sent from the UserController to load the"
                 + " updateForm and update User {}", id);
+        String findUserByIdUrl = ApiUrlConstants.USER_API_BASE_URL
+                + "/findById/" + id;
         try {
-            Optional<UserDTO> userDTO = service.findById(id);
-            if (userDTO.isPresent()) {
-                LOGGER.info("updateForm loaded successfully");
-                model.addAttribute("user", userDTO.get());
-            }
-        } catch (NoSuchElementException e) {
+            ResponseEntity<UserDTO> responseEntity = template.exchange(
+                    findUserByIdUrl,
+                    HttpMethod.GET,
+                    null,
+                    UserDTO.class
+            );
+            model.addAttribute("user", responseEntity.getBody());
+            LOGGER.info("updateForm loaded successfully");
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load User {}."
                     + " No matching resource is present", id);
             return "404NotFound/404";
@@ -181,17 +184,22 @@ public class UserController {
      */
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") final Integer id,
-                             @Valid final UserDTO user,
+                             @Valid @ModelAttribute("user") final UserDTO user,
                              final BindingResult result,
                              final Model model) {
         LOGGER.debug("POST request sent from the UserController"
                 + " to update User {}", id);
+        String updateUserUrl = ApiUrlConstants.USER_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
-            user.setPassword(encoder.encode(user.getPassword()));
-            User userToUpdate = converter.userDTOToUserEntityConverter(user);
-            service.updateUser(id, userToUpdate);
+            HttpEntity<UserDTO> httpEntity = new HttpEntity<>(user);
+            template.exchange(
+                    updateUserUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("User {} updated successfully", id);
-            model.addAttribute(USER_LIST, service.findAllUsers());
             return REDIRECTION_LINK;
         }
         LOGGER.error("Failed to update User {}. UpdateForm reloaded", id);
@@ -210,13 +218,17 @@ public class UserController {
     public String deleteUser(@RequestParam final Integer id) {
         LOGGER.debug("GET request sent from the UserController"
                 + " to delete User {}", id);
+        String deleteUserUrl = ApiUrlConstants.USER_API_BASE_URL
+                + "/delete/" + id;
         try {
-            Optional<UserDTO> findUser = service.findById(id);
-            if (findUser.isPresent()) {
-                service.deleteUser(id);
-                LOGGER.info("User {} deleted successfully", id);
-            }
-        } catch (NoSuchElementException e) {
+            template.exchange(
+                    deleteUserUrl,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("User {} deleted successfully", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Deletion failed. No matching User resource"
                     + " for id: {}", id);
             return "404NotFound/404";

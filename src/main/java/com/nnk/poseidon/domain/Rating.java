@@ -56,7 +56,7 @@ public class Rating {
      * s and p rating.
      */
     @NonNull
-    @NotBlank(message = "S & P rating is mandatory")
+    @NotBlank(message = "S & P Rating is mandatory")
     @Column(name = "s_and_p_rating",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String sandPRating;

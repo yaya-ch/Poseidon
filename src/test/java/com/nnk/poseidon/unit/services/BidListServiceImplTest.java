@@ -6,6 +6,7 @@ import com.nnk.poseidon.domain.BidList;
 import com.nnk.poseidon.dto.BidListDTO;
 import com.nnk.poseidon.repositories.BidListRepository;
 import com.nnk.poseidon.services.BidListServiceImpl;
+import javassist.NotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,14 +32,12 @@ class BidListServiceImplTest {
     @Mock
     private BidListConverter converter;
 
-    private DataLoader dataLoaderForUnitTests;
-
     private BidList bidList;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         service = new BidListServiceImpl(repository, converter);
-        dataLoaderForUnitTests = new DataLoader();
+        DataLoader dataLoaderForUnitTests = new DataLoader();
         bidList = dataLoaderForUnitTests.setBidList();
     }
 
@@ -47,7 +46,7 @@ class BidListServiceImplTest {
     }
 
     @Test
-    void givenNewBidList_whenSaveMethodIsCalled_thenBidListShouldBeSaved() {
+    void givenNewBidList_whenSaveMethodIsCalled_thenBidListShouldBeSaved() throws NotFoundException {
         when(repository.save(any(BidList.class))).thenReturn(bidList);
         service.save(bidList);
         verify(repository, times(1)).save(bidList);
@@ -82,8 +81,8 @@ class BidListServiceImplTest {
     @Test
     void givenCorrectId_whenFindByIdIsCalled_thenBidListShouldBeReturned() {
         when(repository.findById(anyInt())).thenReturn(Optional.of(bidList));
-        Optional<BidListDTO> expected = service.findBidListById(1);
-        assertNotNull(expected);
+        service.findBidListById(1);
+        verify(repository, times(1)).findById(1);
     }
 
     @Test

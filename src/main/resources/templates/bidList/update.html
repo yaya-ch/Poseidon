@@ -20,50 +20,169 @@
               th:object="${bidList}" method="post" class="form-horizontal" style="width: 100%">
 
             <input type="hidden" th:field="*{bidListId}">
-            <input type="text" th:field="*{account}"
-                   class="form-control mb-4 col-4" placeholder="Account">
-            <input type="text" th:field="*{type}"
-                   class="form-control mb-4 col-4" placeholder="Type">
-            <input type="text" th:field="*{bidQuantity}"
-                   class="form-control mb-4 col-4" placeholder="Bid Quantity">
-            <input type="text" th:field="*{askQuantity}"
-                   class="form-control mb-4 col-4" placeholder="Ask Quantity">
-            <input type="text" th:field="*{bid}"
-                   class="form-control mb-4 col-4" placeholder="Bid">
-            <input type="text" th:field="*{ask}"
-                   class="form-control mb-4 col-4" placeholder="Ask">
-            <input type="text" th:field="*{benchmark}"
-                   class="form-control mb-4 col-4" placeholder="Benchmark">
+            <div class="form-group">
+                <label for="account" class="col-sm-2 control-label">Account:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{account}"
+                           class="form-control mb-4 col-4" placeholder="Account" id="account">
+                </div>
+                <div class="col-sm-10 mt-1">
+                    <p class="text-danger" th:if="${#fields.hasErrors('account')}" th:errors="*{account}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="type" class="col-sm-2 control-label">Type:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{type}"
+                           class="form-control mb-4 col-4" placeholder="Type" id="type">
+                </div>
+                <div class="col-sm-10 mt-1">
+                    <p class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bidQuantity" class="col-sm-2 control-label">Bid Quantity:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{bidQuantity}"
+                           class="form-control mb-4 col-4" placeholder="Bid Quantity" id="bidQuantity">
+                </div>
+                <div class="col-sm-10 mt-1">
+                    <p class="text-danger" th:if="${#fields.hasErrors('bidQuantity')}" th:errors="*{bidQuantity}"></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="askQuantity" class="col-sm-2 control-label">Ask Quantity:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{askQuantity}"
+                           class="form-control mb-4 col-4" placeholder="Ask Quantity" id="askQuantity">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bid" class="col-sm-2 control-label">Bid:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{bid}"
+                           class="form-control mb-4 col-4" placeholder="Bid" id="bid">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ask" class="col-sm-2 control-label">Ask:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{ask}"
+                           class="form-control mb-4 col-4" placeholder="Ask" id="ask">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="benchmark" class="col-sm-2 control-label">Benchmark:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{benchmark}"
+                           class="form-control mb-4 col-4" placeholder="Benchmark" id="benchmark">
+                </div>
+            </div>
+
             <input type="hidden" th:field="*{bidListDate}">
-            <input type="text" th:field="*{commentary}"
-                   class="form-control mb-4 col-4" placeholder="Commentary">
-            <input type="text" th:field="*{security}"
-                   class="form-control mb-4 col-4" placeholder="Security">
-            <input type="text" th:field="*{status}"
-                   class="form-control mb-4 col-4" placeholder="Status">
-            <input type="text" th:field="*{trader}"
-                   class="form-control mb-4 col-4" placeholder="Trader">
-            <input type="text" th:field="*{book}"
-                   class="form-control mb-4 col-4" placeholder="Book">
+
+            <div class="form-group">
+                <label for="commentary" class="col-sm-2 control-label">Commentary:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{commentary}"
+                           class="form-control mb-4 col-4" placeholder="Commentary" id="commentary">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="security" class="col-sm-2 control-label">Security:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{security}"
+                           class="form-control mb-4 col-4" placeholder="Security" id="security">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="status" class="col-sm-2 control-label">Status:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{status}"
+                           class="form-control mb-4 col-4" placeholder="Status" id="status">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="trader" class="col-sm-2 control-label">Trader:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{trader}"
+                           class="form-control mb-4 col-4" placeholder="Trader" id="trader">
+                </div>
+            </div>
+
             <input type="hidden" th:field="*{creationName}">
             <input type="hidden" th:field="*{creationDate}">
-            <input type="text" th:field="*{revisionName}"
-                   class="form-control mb-4 col-4" placeholder="Revision Name">
-            <input type="text" th:field="*{dealName}"
-                   class="form-control mb-4 col-4" placeholder="Deal Name">
-            <input type="text" th:field="*{dealType}"
-                   class="form-control mb-4 col-4" placeholder="Deal Type">
-            <input type="text" th:field="*{sourceListId}"
-                   class="form-control mb-4 col-4" placeholder="Source List Id">
-            <input type="text" th:field="*{side}"
-                   class="form-control mb-4 col-4" placeholder="Side">
-            <button type="submit" class="btn btn-info col-2">Update</button>
 
-            <a class="btn btn-danger col-2" th:href="@{/bidList/list}"
-               role="button"
-               th:onclick="if (!(confirm('Are you sure you want to cancel? All changes will be discarded'))) return false">
-                Cancel
-            </a>
+            <div class="form-group">
+                <label for="revisionName" class="col-sm-2 control-label">Revision Name:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{revisionName}"
+                           class="form-control mb-4 col-4" placeholder="Revision Name" id="revisionName">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="book" class="col-sm-2 control-label">Book:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{book}"
+                           class="form-control mb-4 col-4" placeholder="Book" id="book">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dealName" class="col-sm-2 control-label">Deal Name:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{dealName}"
+                           class="form-control mb-4 col-4" placeholder="Deal Name" id="dealName">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dealType" class="col-sm-2 control-label">Deal Type:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{dealType}"
+                           class="form-control mb-4 col-4" placeholder="Deal Type" id="dealType">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sourceListId" class="col-sm-2 control-label">Source List Id:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{sourceListId}"
+                           class="form-control mb-4 col-4" placeholder="Source List Id" id="sourceListId">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="side" class="col-sm-2 control-label">Side:</label>
+                <div class="col-sm-10">
+                    <input type="text" th:field="*{side}"
+                           class="form-control mb-4 col-4" placeholder="Side" id="side">
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-info">Update</button>
+                    <a class="btn btn-danger" th:href="@{/bidList/list}"
+                       role="button"
+                       th:onclick="if (!(confirm('Are you sure you want to cancel? All changes will be discarded'))) return false">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+
             <br/><br/><br/><br/>
 
         </form>

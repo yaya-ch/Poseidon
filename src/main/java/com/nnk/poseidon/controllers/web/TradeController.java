@@ -1,12 +1,14 @@
 package com.nnk.poseidon.controllers.web;
 
-import com.nnk.poseidon.converters.TradeConverter;
-import com.nnk.poseidon.domain.Trade;
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.TradeDTO;
-import com.nnk.poseidon.services.TradeService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,11 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.List;
 
 /**
  * The type RuleName controller.
@@ -54,26 +58,18 @@ public class TradeController {
     private static final String REDIRECTION_LINK = "redirect:/trade/list";
 
     /**
-     * TradeService to inject.
+     * RestTemplate to inject.
      */
-    private final TradeService service;
-
-    /**
-     * TradeConverter to inject.
-     */
-    private final TradeConverter converter;
+    private final RestTemplate template;
 
     /**
      * Instantiates a new Trade controller.
-     *
-     * @param tradeService   the trade service
-     * @param tradeConverter the trade converter
+     * @param restTemplate RestTemplate instance that is used for
+     *                     consuming the API
      */
     @Autowired
-    public TradeController(final TradeService tradeService,
-                           final TradeConverter tradeConverter) {
-        this.service = tradeService;
-        this.converter = tradeConverter;
+    public TradeController(final RestTemplate restTemplate) {
+        this.template = restTemplate;
     }
 
     /**
@@ -86,7 +82,14 @@ public class TradeController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from the TradeController to load the"
                 + " Trade home page");
-        model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
+        String findAllUrl = ApiUrlConstants.TRADE_API_BASE_URL + "/findAll";
+        ResponseEntity<List<TradeDTO>> responseEntity = template.exchange(
+                findAllUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<TradeDTO>>() { }
+        );
+        model.addAttribute(TRADE_LIST_ATTRIBUTE, responseEntity.getBody());
         return "trade/list";
     }
 
@@ -115,21 +118,26 @@ public class TradeController {
      * or redirects user to the Trade home page
      */
     @PostMapping("/validate")
-    public String validate(@Valid final TradeDTO trade,
+    public String validate(@Valid
+                           @ModelAttribute("trade") final TradeDTO trade,
                            final BindingResult result,
                            final Model model) {
         LOGGER.debug("POST request sent from the TradeController"
                 + " to save a new Trade");
+        String addTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL + "/add";
         if (!result.hasErrors()) {
             trade.setTradeDate(new Timestamp(System.currentTimeMillis()));
             trade.setCreationDate(new Timestamp(System.currentTimeMillis()));
             trade.setRevisionName(null);
             trade.setRevisionDate(null);
-            Trade tradeToSave =
-                    converter.tradeDTOToTradeEntityConverter(trade);
-            service.saveTrade(tradeToSave);
+            HttpEntity<TradeDTO> httpEntity = new HttpEntity<>(trade);
+            template.exchange(
+                    addTradeUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("new Trade saved successfully by the TradeController");
-            model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
             return REDIRECTION_LINK;
         } else {
             LOGGER.error("Failed to save the Trade. Add form reloaded");
@@ -152,12 +160,18 @@ public class TradeController {
         LOGGER.debug("GET request sent from the TradeController to update"
                 + " Trade {}", id);
         try {
-            Optional<TradeDTO> trade = service.findTradeById(id);
-            if (trade.isPresent()) {
-                LOGGER.info("Update form loaded successfully");
-                model.addAttribute(TRADE_ATTRIBUTE, trade.get());
-            }
-        } catch (NoSuchElementException e) {
+            String findTradeById = ApiUrlConstants.TRADE_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<TradeDTO> responseEntity = template.exchange(
+                    findTradeById,
+                    HttpMethod.GET,
+                    null,
+                    TradeDTO.class
+            );
+            model.addAttribute(TRADE_ATTRIBUTE, responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update Trade {}", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load Trade {}."
                     + " No matching resource is present", id);
             return "404NotFound/404";
@@ -177,18 +191,24 @@ public class TradeController {
      */
     @PostMapping("/update/{id}")
     public String updateTrade(@PathVariable("id") final Integer id,
-                              @Valid final TradeDTO trade,
+                              @Valid
+                              @ModelAttribute("trade") final TradeDTO trade,
                               final BindingResult result,
                               final Model model) {
         LOGGER.debug("POST request sent from the Trade controller to update"
                 + " Trade {}", id);
+        String updateTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
             trade.setRevisionDate(new Timestamp(System.currentTimeMillis()));
-            Trade tradeToUpdate =
-                    converter.tradeDTOToTradeEntityConverter(trade);
-            service.updateTrade(id, tradeToUpdate);
+            HttpEntity<TradeDTO> httpEntity = new HttpEntity<>(trade);
+            template.exchange(
+                    updateTradeUrl,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("Trade {} update successfully", id);
-            model.addAttribute(TRADE_LIST_ATTRIBUTE, service.findAllTrades());
             return REDIRECTION_LINK;
         }
         model.addAttribute(TRADE_ATTRIBUTE, trade);
@@ -207,13 +227,17 @@ public class TradeController {
     public String deleteTrade(@RequestParam final Integer id) {
         LOGGER.debug("GET request sent from the"
                 + " TradeController to delete Trade {}", id);
+        String deleteTradeUrl = ApiUrlConstants.TRADE_API_BASE_URL
+                + "/delete/" + id;
         try {
-            Optional<TradeDTO> check = service.findTradeById(id);
-            if (check.isPresent()) {
-                service.deleteTrade(id);
-                LOGGER.info("Trade {} deleted successfully", id);
-            }
-        } catch (NoSuchElementException e) {
+            template.exchange(
+                    deleteTradeUrl,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info("Trade {} deleted successfully", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Deletion failed. No matching Trade resource"
                     + " for id: {}", id);
             return "404NotFound/404";

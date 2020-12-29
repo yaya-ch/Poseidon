@@ -1,12 +1,14 @@
 package com.nnk.poseidon.controllers.web;
 
-import com.nnk.poseidon.converters.CurvePointConverter;
-import com.nnk.poseidon.domain.CurvePoint;
+import com.nnk.poseidon.constants.ApiUrlConstants;
 import com.nnk.poseidon.dto.CurvePointDTO;
-import com.nnk.poseidon.services.CurvePointService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,12 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * The type Curve controller.
@@ -51,26 +54,18 @@ public class CurvePointController {
             "redirect:/curvePoint/list";
 
     /**
-     * CurvePointService to inject.
+     * RestTemplate to inject.
      */
-    private final CurvePointService service;
-
-    /**
-     * CurvePointConverter to inject.
-     */
-    private final CurvePointConverter converter;
+    private final RestTemplate template;
 
     /**
      * Instantiates a new CurvePointController.
-     *
-     * @param curvePointService   the CurvePointService
-     * @param curvePointConverter the CurvePointConverter
+     * @param restTemplate RestTemplate instance that is used for
+     *                     consuming the API
      */
     @Autowired
-    public CurvePointController(final CurvePointService curvePointService,
-                                final CurvePointConverter curvePointConverter) {
-        this.service = curvePointService;
-        this.converter = curvePointConverter;
+    public CurvePointController(final RestTemplate restTemplate) {
+        this.template = restTemplate;
     }
 
     /**
@@ -83,8 +78,15 @@ public class CurvePointController {
     public String home(final Model model) {
         LOGGER.debug("GET request sent from home method"
                 + " of the CurvePointController to load all CurvePoints");
-        List<CurvePointDTO> curvePointList = service.findAllCurvePoints();
-        model.addAttribute("curvePointList", curvePointList);
+        String findAllCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/findAll";
+        ResponseEntity<List<CurvePointDTO>> responseEntity = template.exchange(
+                findAllCurvePointUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<CurvePointDTO>>() { }
+        );
+        model.addAttribute("curvePointList", responseEntity.getBody());
         return "curvePoint/list";
     }
 
@@ -112,19 +114,26 @@ public class CurvePointController {
      * @return the string
      */
     @PostMapping("/validate")
-    public String validate(@Valid final CurvePointDTO curvePoint,
+    public String validate(@Valid
+                           @ModelAttribute("curvePoint")
+                           final CurvePointDTO curvePoint,
                            final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from the validate method of the"
                 + " CurvePointController to save a new CurvePoint");
+        String addCurvePointUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/add";
         if (!result.hasErrors()) {
             curvePoint.setCreationDate(
                     new Timestamp(System.currentTimeMillis()));
-            CurvePoint curvePointToSave =
-                    converter.curvePointDTOToCurvePointEntity(curvePoint);
-            service.saveCurvePoint(curvePointToSave);
-            model.addAttribute(CURVE_POINT_ATTRIBUTE, curvePointToSave);
+            HttpEntity<CurvePointDTO> httpEntity = new HttpEntity<>(curvePoint);
+            template.exchange(
+                    addCurvePointUrl,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("CurvePoint {} saved successfully",
-                    curvePointToSave.getCurvePointId());
+                    curvePoint.getCurveId());
             return REDIRECTION_URL;
         }
         LOGGER.error("Failed to save the CurvePoint."
@@ -146,15 +155,19 @@ public class CurvePointController {
         LOGGER.debug("GET request sent from the showUpdateForm of the "
                 + " CurvePointController to update CurvePoint {}", id);
         try {
-            Optional<CurvePointDTO> curvePointToUpdate =
-                    service.findCurvePointById(id);
-            if (curvePointToUpdate.isPresent()) {
-                LOGGER.debug("CurvePoint {} loaded successfully"
-                        + " in the updateForm", id);
-                model.addAttribute(CURVE_POINT_ATTRIBUTE,
-                        curvePointToUpdate.get());
-            }
-        } catch (NoSuchElementException e) {
+            String findCurveByIdUrl = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                    + "/findById/" + id;
+            ResponseEntity<CurvePointDTO> responseEntity = template.exchange(
+                    findCurveByIdUrl,
+                    HttpMethod.GET,
+                    null,
+                    CurvePointDTO.class
+            );
+            model.addAttribute(CURVE_POINT_ATTRIBUTE,
+                    responseEntity.getBody());
+            LOGGER.info("Update form loaded successfully"
+                    + " to update CurvePoint {}", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("Failed to load CurvePoint {}", id);
             return "404NotFound/404";
         }
@@ -173,17 +186,23 @@ public class CurvePointController {
      */
     @PostMapping("/update/{id}")
     public String updateCurvePoint(@PathVariable("id") final Integer id,
-                                   @Valid final CurvePointDTO curvePoint,
+                                   @Valid @ModelAttribute("curvePoint")
+                                   final CurvePointDTO curvePoint,
                             final BindingResult result, final Model model) {
         LOGGER.debug("POST request sent from updateCurvePoint of the"
                 + " CurvePointController to update CurvePoint {}", id);
+        String updateCurvePoint = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                + "/update/" + id;
         if (!result.hasErrors()) {
-            CurvePoint curvePointToSave =
-                    converter.curvePointDTOToCurvePointEntity(curvePoint);
-            service.updateCurvePoint(id, curvePointToSave);
+            HttpEntity<CurvePointDTO> httpEntity = new HttpEntity<>(curvePoint);
+            template.exchange(
+                    updateCurvePoint,
+                    HttpMethod.PUT,
+                    httpEntity,
+                    String.class
+            );
             LOGGER.info("CurvePoint {} updated successfully."
                     + " Redirecting to CurvePoint list", id);
-            model.addAttribute("curvePointList", service.findAllCurvePoints());
             return REDIRECTION_URL;
         }
         LOGGER.error("CurvePoint {} update Failed."
@@ -203,14 +222,17 @@ public class CurvePointController {
         LOGGER.debug("GET request sent from the deleteCurve of the"
                 + " CurvePointController to delete CurvePoint {}", id);
         try {
-            Optional<CurvePointDTO> findCurvePointById =
-                    service.findCurvePointById(id);
-            if (findCurvePointById.isPresent()) {
-                LOGGER.info(" CurvePoint {} deleted successfully."
-                        + " Redirecting to the CurvePoint list", id);
-                service.deleteCurvePointById(id);
-            }
-        } catch (NoSuchElementException e) {
+            String deleteCurvePoint = ApiUrlConstants.CURVE_POINT_API_BASE_URL
+                    + "/delete/" + id;
+            template.exchange(
+                    deleteCurvePoint,
+                    HttpMethod.DELETE,
+                    null,
+                    String.class
+            );
+            LOGGER.info(" CurvePoint {} deleted successfully."
+                    + " Redirecting to the CurvePoint list", id);
+        } catch (HttpServerErrorException e) {
             LOGGER.error("There is no matching CurvePoint that has id {}", id);
             return "404NotFound/404";
         }

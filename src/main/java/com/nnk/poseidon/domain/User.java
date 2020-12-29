@@ -1,6 +1,7 @@
 package com.nnk.poseidon.domain;
 
 import com.nnk.poseidon.constants.ConstantNumbers;
+import com.nnk.poseidon.security.passwordvalidation.ValidPassword;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
@@ -54,7 +55,8 @@ public class User {
      * user password.
      */
     @NonNull
-    @NotBlank(message = "Password is mandatory")
+    @ValidPassword
+    @NotBlank(message = "Password is mandatory and must not be black")
     @Column(name = "password",
             length = ConstantNumbers.ONE_HUNDRED_AND_TWENTY_FIVE)
     private String password;

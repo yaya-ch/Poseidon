@@ -22,14 +22,14 @@ public class TradeDTO {
      * account.
      */
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     private String account;
 
     /**
      * type.
      */
     @NotNull
-    @NotBlank
+    @NotBlank(message = "Type is mandatory")
     private String type;
 
     /**

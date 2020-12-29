@@ -35,7 +35,7 @@ public class RatingDTO {
     /**
      * s and p rating.
      */
-    @NotBlank(message = "S & P rating is mandatory")
+    @NotBlank(message = "S & P Rating is mandatory")
     private String sandPRating;
 
     /**
